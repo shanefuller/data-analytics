@@ -1,0 +1,418 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, digits = 3, warning = FALSE)
+```
+
+## Part I: Introduction
+
+As visibility for the sport of Ultimate Frisbee continues to grow in academic universities, professional leagues, and now with the recent eligiblilty for the 2024 Olympics, it seems there can be plenty to learn from a sport that has had no sports analytics department throughout its 50 year grassroots lifespan. In this data exploration and analysis, we are looking to replicate strategies that have been used in the larger professional sports and apply this knowledge to our current understanding of Ultimate Frisbee in hopes to help build a foundation for analysis within the sport. A few of the questions our group intends to explore includes what qualities of a throw result in a score, what throwing maps within the sport look like, and whether or not throwing within the same verticle third has any effect on whether or not a throw was successfully caught. This project was done at Skidmore College, and was completed with the help of sports analyst Dr. Mike Lopez.
+
+## Part II: Importing the data set, data cleansing
+
+```{r, echo = FALSE, message=FALSE, results='hide'}
+library(RCurl); library(tidyverse);
+url <- getURL("https://raw.githubusercontent.com/pk285/Final-Project-Kacham/master/NexGen13newPlays.csv")
+ulti_pbp_data <- read.csv(text = url)
+ulti_pbp_data
+
+ulti_pbp_data <- ulti_pbp_data %>% rename(distance = Distance, intercept = Intercept., stall = Stall., play_id = Play.Id, pos_id = Possession.Id, vert_dist = Vertical.Distance, total_dist = Total.Distance, thrower_id = Thrower.id, reciever_id = Reciever.Id, breakthrow = Breakthrow., stall_six = Stall.Six., stall_eight = Stall.Eight., defender_id = Defender.Id, block = Block., throwaway = Throwaway., drop = Drop., score = Score., point_id = Point.Id, game_id = Game.Id, opponent_name = Opponent.Name, home_attacking_right = Home.Attacking.Right., home_on_offense = Home.on.Offense)
+
+## subtract 5000 from both positons to get middle of field to be 0
+ulti_pbp_data <- ulti_pbp_data %>%  mutate(x_pos = `X.Position` - 5000, 
+                                          y_pos = `Y.Position` - 5000, 
+                                          last_x = `Last.X` - 5000, 
+                                          last_y = `Last.Y` - 5000, 
+                                          next_x = as.numeric(`Next.X`) - 5000, 
+                                          next_y = as.numeric(`Next.Y`) - 5000)
+
+ulti_pbp_data <- ulti_pbp_data %>% 
+  mutate(x_cut = cut(x_pos, 5), 
+         y_cut = cut(y_pos, 3), 
+         x_last_cut = cut(last_x, 5), 
+         y_last_cut = cut(last_y, 3),
+         x_next_cut = cut(next_x, 5), 
+         y_next_cut = cut(next_y, 3))
+
+ulti_pbp_data$score <- as.numeric(ulti_pbp_data$score)
+ulti_pbp_data$home_attacking_right <- as.numeric(ulti_pbp_data$home_attacking_right)
+ulti_pbp_data$throwaway <- as.numeric(ulti_pbp_data$throwaway)
+ulti_pbp_data$home_on_offense <- as.numeric(ulti_pbp_data$home_on_offense)
+ulti_pbp_data$intercept <- as.numeric(ulti_pbp_data$intercept)
+ulti_pbp_data$drop <- as.numeric(ulti_pbp_data$drop)
+ulti_pbp_data$block <- as.numeric(ulti_pbp_data$block)
+
+ulti_pbp_data$score[ulti_pbp_data$score == 1] <- 0
+ulti_pbp_data$score[ulti_pbp_data$score == 2] <- 1
+
+ulti_pbp_data$home_attacking_right[ulti_pbp_data$home_attacking_right == 1] <- 0
+ulti_pbp_data$home_attacking_right[ulti_pbp_data$home_attacking_right == 2] <- 1
+
+ulti_pbp_data$throwaway[ulti_pbp_data$throwaway == 1] <- 0
+ulti_pbp_data$throwaway[ulti_pbp_data$throwaway == 2] <- 1
+
+ulti_pbp_data$home_on_offense[ulti_pbp_data$home_on_offense == 1] <- 0
+ulti_pbp_data$home_on_offense[ulti_pbp_data$home_on_offense == 2] <- 1
+
+ulti_pbp_data$intercept[ulti_pbp_data$intercept == 1] <- 0
+ulti_pbp_data$intercept[ulti_pbp_data$intercept == 2] <- 1
+
+ulti_pbp_data$drop[ulti_pbp_data$drop == 1] <- 0
+ulti_pbp_data$drop[ulti_pbp_data$drop == 2] <- 1
+
+ulti_pbp_data$block[ulti_pbp_data$block == 1] <- 0
+ulti_pbp_data$block[ulti_pbp_data$block == 2] <- 1
+
+ulti_pbp_data <- ulti_pbp_data %>% mutate(x_adj_last = if((home_attacking_right == 1 & home_on_offense == 1) || (home_on_offense == 0 & home_attacking_right == 0)) 
+             {last_x}
+         else if((home_on_offense == 1 & home_attacking_right == 0) || (home_on_offense == 0 & home_attacking_right == 1)) 
+             {-1*last_x},
+         y_adj_last = 
+           ifelse((home_attacking_right == 1 & home_on_offense == 1) | (home_on_offense == 0 & home_attacking_right == 0),
+                               last_y, -1*last_y),
+
+x_adj = if((home_attacking_right == 1 & home_on_offense == 1) || (home_on_offense == 0 & home_attacking_right == 0)) {x_pos}
+         else if((home_on_offense == 1 & home_attacking_right == 0) || (home_on_offense == 0 & home_attacking_right == 1)) {-1*x_pos},
+
+y_adj = ifelse(home_attacking_right == TRUE & home_on_offense == TRUE | 
+                 home_on_offense == FALSE & home_attacking_right == FALSE,
+                               y_pos, -1*y_pos))
+
+ulti_pbp_data <- ulti_pbp_data %>% mutate(x_cut_adj = cut(x_adj, 3), 
+         y_cut_adj = cut(y_adj, 3), 
+         x_last_cut_adj = cut(x_adj_last, 3), 
+         y_last_cut_adj = cut(y_adj_last, 3))
+
+ulti_pbp_data <- ulti_pbp_data %>% mutate(
+  catch = ifelse((block == 0 & throwaway == 0 & intercept == 0 & drop == 0), 1, 0), 
+  
+  same_third = ifelse((y_last_cut_adj == "(-4.16e+03,-1.42e+03]" & y_cut_adj == "(-4.06e+03,-1.13e+03]") |
+                    (y_last_cut_adj == "(-1.42e+03,1.32e+03]" & y_cut_adj == "(-1.13e+03,1.79e+03]") |
+                    (y_last_cut_adj == "(1.32e+03,4.06e+03]" & y_cut_adj == "(1.79e+03,4.71e+03]"), 1, 0))
+
+head(ulti_pbp_data)
+```
+
+The first portion of the analysis was to find a relevant data set that we could use. Unfortunately, because Ultimate Frisbee is a grassroots community, there have not been many publicly released data sets that are very accurate. However, we were able to find a data set that was released through a data visualization project that was done by Prahasi Kacham at Nova Southeastern University in 2017. This dataset seemed to be taken from a 2013 tournament that placed 15 of the best college ultimate frisbee players, and had them compete against a number of AUDL club teams. Therefore, the average level of skill for this dataset is very high, and has significant differences from what is seen in average D-III college play, which is where we have our experience. The data, which was gathered by NexGen, did not take too many additional steps to clean to get prepared for analysis, as the rows were consistently filled with proper values. However, to make analysis a bit easier, we made a few changes to make analysis easier. First, we changed the naming conventions for all the variables in the dataset. This step was not necessary, however many of the variables had extra spaces which made manipulation tedious, so we found it more straightforward to just rename the variable names. The next alterations that we did involved centering the X and Y coordinates in relation to where throws and catches occured on the field. The center of the field in the original dataset was set at the point (5000,5000), so we simply subtracted 5000 from all coordinate values to have the center of the field be set at the point (0,0). The next alteration we made, which again was not necessary, was to change the binary values to numeric, where all 0 values were false, and all 1 values were true. Again, this was personal preference, and we found working with these values to be easier than working with character values of 'true' and 'false'. Another mutation that we conducted, which is similar to work found in hockey analytics, is that we standardized the side of the field that the coordinates were in relation to. For this step, this involved taking into account whether or not the home team was attacking, and and flipping the X and Y coordinates over the horizontal half of the field. The updated coordinated were placed into x_adj and y_adj variables, and essientially this allows every throw to be moving towards the same endzone, rather than working down two separate endzones. The last relevant work with cleansing the data involved creating a few new variables that would be used further in the dataset. The first was simply creating a binary value to account for whether or not the throw resulted in a catch. The last set of variables involved dividing the field into vertical thrids, which is a variable that is created to do further analysis on whether or not throwing in the same third is appropriate. More on this theory is explained our vertical third exploration section. With the creation of these last few variables, we found that the data set was properly imported and clenased, and felt that the dataset was ready for proper analysis.
+
+## Part III: Data exploration
+
+
+```{r}
+only_scores <- ulti_pbp_data %>% filter(score == TRUE)
+```
+
+
+A summary of the players with the most throws.
+```{r}
+ulti_pbp_data %>%
+  group_by(thrower_id) %>%
+  summarise(totalthrows = n())%>%
+  arrange(desc(totalthrows))
+```
+
+A summary of the throwers with the most assists
+```{r}
+ulti_pbp_data %>%
+  group_by(thrower_id) %>%
+  summarise(assists = sum(score))%>%
+  arrange(desc(assists))
+```
+
+A summary of recievers who caught the most passes.
+```{r}
+ulti_pbp_data %>%
+  group_by(reciever_id) %>%
+  summarise(score_rec = sum(score))%>%
+  arrange(desc(score_rec))
+```
+A summary of players with the most goals
+
+```{r}
+only_scores %>%
+  group_by(reciever_id) %>%
+  summarise( goals = sum(score))%>%
+  arrange(desc(goals))
+```
+
+A histogram representing the distribution in the length of throws
+```{r}
+throwdist <- ggplot(ulti_pbp_data, aes(x = distance)) +
+         geom_histogram() 
+         
+throwdist + ggtitle("Length of Throws") + xlab("Length (ft)") + ylab("Number of Throws")
+```
+
+
+A histogram representing the distribution in the length of assists
+
+```{r}
+throwdistscores <- ggplot(only_scores, aes(x = distance)) +
+         geom_histogram()
+         
+throwdistscores + ggtitle("Length of Assists") +xlab("Height (ft)") + ylab("Number of Assists")
+```
+A histogram showing the distribution in height of throws.
+
+```{r}
+throwheight <- ggplot(ulti_pbp_data, aes(x = vert_dist)) +
+         geom_histogram()
+         
+throwheight + ggtitle("Height of Throws") + xlab("Height (ft)") + ylab("Number of Throws")
+```
+
+A histogram showng the distribution in height of assists.
+
+```{r}
+assistheight <- ggplot(only_scores, aes(x = vert_dist)) +
+         geom_histogram()
+          
+assistheight + ggtitle("Height of Assists") + xlab("Height (ft)") + ylab("Number of Throws")
+```
+
+
+Team that allowed the most scores against them
+```{r}
+ulti_pbp_data %>%
+  group_by(opponent_name) %>%
+  summarise(scores_allowed = sum(score))%>%
+  arrange(desc(scores_allowed))
+```
+
+Summary table for goals scored by NextGen and goals scored by oposing teams. 
+```{r}
+ulti_pbp_data %>%
+  group_by(home_on_offense) %>%
+  summarise(point = sum(score))
+```
+
+
+Analysis of the data exploration phase will go here...
+  -A bulk of the work will go here
+  -Explanation of important variables
+  -Further understanding throws, plays, specific players, specific teams
+  -Look at how successful certain throws were
+  -Look at how successful players were
+  -Spend time fully understanding the X Y coordinates so we can create effective throwing maps
+  -Be very descriptive about what each row means in context of the larger data set
+
+## Part IV: Regression Models for Scores
+
+When approaching the data set, the question that we found to be most interesting to approaching would be to determine what qualities of a thow lead to the highest rate of success. Therefore, each of the models that we created below were all a function of whether or not the throw resulted in a score. This is a binary result, therefore logistic regression was used.
+
+# Model Creation for Score
+
+```{r}
+library(splines)
+
+score1 <- glm(score ~ total_dist + vert_dist + home_attacking_right + opponent_name + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+score2 <- glm(score ~ total_dist + vert_dist + opponent_name + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+score3 <- glm(score ~ total_dist + vert_dist + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+score4 <- glm(score ~ ns(total_dist, 9) + vert_dist + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+score5 <- glm(score ~ ns(total_dist, 9) + ns(vert_dist, 2) + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+score6 <- glm(score ~ total_dist + vert_dist + home_attacking_right + opponent_name + x_cut + y_cut + same_third, data = ulti_pbp_data, family = "binomial")
+```
+
+For the creation of the best model, we decided to take an approach similiar to backwards elimination, where we start with all relevant and usable variables, and remove values that appear to be unhelpful to the model. We chose to remove variables based on the AIC values that were produced from each logistic model. As frisbee players, we found that information regarding whether or not it was a breakthrow, information regarding the stall count, and information regarding the enviornment that the throws were placed would have been interesting, however we found in the data exploration phase that the data had few entries providing relevant data of these throws. Therefore, the first model that we ran only included information on the team, the location on the field regarding where it was thrown from, whether the home team was attacking, how far the throw went, and the vertical height of the throw. We learned quickly from the progression of the variables that the data involving the defensive team and whether or not the home team was attacking was irrelevant, which would make sense for teams at that level of play. Moving forward, this lead to data involving where on the field it was thrown and how far the throw went, however we felt that the model could be made even more accurate. Therefore, we decided to try using splines to get a better understanding of vertical height and total distance thrown. When splining these variables, we managed to get a relatively low AIC value. In context, the decision to spline these variables made sense, as the distance of a throw logically makes sense to the success of the throw. In other words, shorter throws are less likely to get defended properly than a short, quick throw. Shorter throws tend to be more accurate, and throws lower to the ground tend to have a harder time getting defended, as well as travel better in the wind. With all of these considerations, this lead to our best model found in fit5.
+
+# AIC Values for Scoring models
+
+```{r}
+AIC(score1)
+AIC(score2)
+AIC(score3)
+AIC(score4)
+AIC(score5)
+AIC(score6)
+```
+
+To interpret the results above, it is easiest to divide the AIC values into three groups. The first group would be fit1 and fit2, which both included unhelpful variables. These resulted in the highest AIC values, and when opponent_name and home_attacking_right were both taken out, this lead to a large decrease. The second group contains the AIC value from fit3, which is decent, however can be improved upon when adding spline terms to the total_dist and vert_dist. The last group, which were the the most successful AIC values, shows a greater jump, simply due to the significance of splicing those two variables. In other words, the greatest impacts on AIC values was in the removal of both variables, and in the splining of total_dist.
+
+# Hosmer Lemeshow test on best fit model
+
+```{r}
+ulti_pbp_data <- ulti_pbp_data %>% 
+  mutate(predict_Score = predict(score5, ulti_pbp_data, type = "response"))
+
+tab_check <- ulti_pbp_data %>%
+  mutate(throw_prob_cat = cut(predict_Score, 10)) %>%
+  group_by(throw_prob_cat) %>%
+  summarise(ave_exp_scores = sum(predict_Score),
+            ave_act_scores = sum(score),
+            n_throws = n())
+
+tab_check <- tab_check %>%
+  mutate(diff_sq = (ave_exp_scores - ave_act_scores)^2/
+           ((ave_exp_scores)*(1-ave_exp_scores/n_throws)))
+
+tab_check
+
+hm_test <- tab_check %>%
+  summarise(test_stat = sum(diff_sq))
+
+hm_test
+
+1-pchisq(hm_test$test_stat, df = 8, lower.tail = TRUE)
+```
+
+The final interpretation that we wanted to gather from our regression models was in a measure of the goodness of fit for our best model. For this, we decided to use the Hosmer Lemeshow test, as we felt this was the best model to determine goodness of fit for a logistic regression model. Looking at the table above, our bins were quiet effective in identifying the actual number of scores in relation to the expected number of scores. Only 4 bins had a difference squared of greater than 1, and even those bins still performed adequately well. Another interesting point in the table is that a large majority of the throws were not expected to score, with over 2300 entries in the first bin. However, this bin still performed well, and was only about 4 goals off of what actually occured in the data set. In conclusion, the Chisquare value resulted in 0.106, which shows significance. Therefore, we fail to reject the null hypothesis that there is no lack of fit, suggesting that our model was relatively successful in determining whether or not a throw would result in a score.
+
+
+## Part V: Regression Models for Catching
+
+After the completion of the first set of regression models, although we found them to be somewhat successful, we felt that only looking at throws that resulted in scores removed many of the throws from the dataset. This suggests that there is more from the dataset that can be discovered about the movement of the frisbee down the field, so for the next set of regression models, we decided to do an exploration of every throw, and whether or not it resulted in a catch.
+
+# Model Creation for Catch
+
+```{r}
+catch1 <- glm(catch ~ total_dist + vert_dist + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+catch2 <- glm(catch ~ total_dist + vert_dist + opponent_name + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+catch3 <- glm(catch ~ total_dist + vert_dist + home_attacking_right + opponent_name + x_cut + y_cut, data = ulti_pbp_data, family = "binomial")
+catch4 <- glm(catch ~ total_dist + vert_dist + home_attacking_right + opponent_name + x_cut + y_cut + same_third, data = ulti_pbp_data, family = "binomial")
+```
+
+
+# AIC Values for Catch models
+
+```{r}
+AIC(catch1)
+AIC(catch2)
+AIC(catch3)
+AIC(catch4)
+```
+
+
+# Hosmer Lemeshow test on best fit model
+
+```{r}
+ulti_pbp_data <- ulti_pbp_data %>% 
+  mutate(predict_Catch = predict(catch4, ulti_pbp_data, type = "response"))
+
+tab_check <- ulti_pbp_data %>%
+  mutate(catch_prob_cat = cut(predict_Catch, 10)) %>%
+  group_by(catch_prob_cat) %>%
+  summarise(ave_exp_catch = sum(predict_Catch),
+            ave_act_catch = sum(catch),
+            n_throw = n())
+
+tab_check <- tab_check %>%
+  mutate(diff_sq = (ave_exp_catch - ave_act_catch)^2/
+           ((ave_exp_catch)*(1-ave_exp_catch/n_throw)))
+
+tab_check
+
+hm_test <- tab_check %>%
+  summarise(test_stat = sum(diff_sq))
+
+hm_test
+
+1-pchisq(hm_test$test_stat, df = 8, lower.tail = TRUE)
+```
+
+After viewing the work done with regression models for whether or not the throw was a catch, we found this exploration to be less succeessful. This is attributed to the lack of helpful variables in the dataset, specifically information regarding closest defender and type of defenses that were run. Looking at the results of the Hosmer Lemeshow test, the best model that we produced was somewhat successful at predicting the number of catches, however there were multiple sections that had larger differences squared. The Chisquare value resulted in 2.081703e-05, which means that we reject the null hypothesis. In other words, this model suggests a lack of fit, and therefore was not as successful as we were hoping. 
+
+
+## Part VI: Throwing Maps
+
+Analysis of the throwing maps phase will go here...
+  -First, create a few simple 2D throwing map showing throws that resulted in scores
+  -Next, create a few simple 2D throwing maps that highlight each play, down the field
+  -The step above will involve using geom_segment(), which is a new function that should piece together plays
+  -Next, create a 3D throwing map showing throws that resulted in scores
+  -Lastly, create a 3D throwing map with geom_segment() showing throws moving down the field
+  
+  
+## Standard graphs of where scores were thrown and caught
+
+```{r}
+scores_caught <- ggplot(only_scores, aes(x_pos, y_pos)) + geom_point()
+scores_thrown <- ggplot(only_scores, aes(last_x, last_y)) +geom_point()
+scores_caught + ggtitle("Where scores are caught") + labs(y= "Y width", x = "X length")
+scores_thrown + ggtitle("Where scores are thrown from") + labs(y= "Y width", x = "X length")
+```
+
+## Adjusted graph of where scores were caught 
+
+```{r}
+scores_caught_adj <- ggplot(ulti_pbp_data %>% filter(score == TRUE), aes(y_adj, x_adj)) + geom_point()
+scores_caught_adj + ggtitle("Endzone: Where scores are caught") + labs(y= "X length", x = "Y width")
+```
+
+## Adjusted graph of where scores were thrown from
+
+```{r}
+scores_thrown_adj <- ggplot(ulti_pbp_data %>% filter(score == TRUE), aes(x_adj_last, y_adj_last)) + geom_point() 
+scores_thrown_adj + ggtitle("Where scores are thrown from adjusted") +xlim(-4500, 4500)
+
+scores_thrown_adj_density <- ggplot(ulti_pbp_data, aes(x_adj_last, y_adj_last, colour = score == 1)) + stat_density_2d()
+scores_thrown_adj_density + ggtitle("Density of where scores are thrown from") + labs(y= "Y width", x = "X length")
+```
+
+
+```{r}
+library("scatterplot3d")
+
+thrower_map <- ulti_pbp_data %>% 
+  filter(thrower_id == "1371832103")
+
+scatterplot3d(x = thrower_map$x_pos, y = thrower_map$y_pos, z = thrower_map$vert_dist, pch = 17, type="h", main="Where 1371832103 Threw in Relation to Vertical Height of Disc",
+              xlab = "X Position",
+              ylab = "Y Position",
+              zlab = "Vertical Height")
+```
+
+```{r}
+score_prob <- ggplot(ulti_pbp_data, aes(x_adj_last, y_adj_last, colour = factor(score), size = predict_Score)) + geom_point()
+score_prob
+```
+
+## Part VII: Vertical Third Exploration
+
+```{r}
+geom_seg_simple <- ulti_pbp_data %>% 
+  sample_frac(0.03) %>% 
+  ggplot(aes(x = x_adj_last, xend = x_adj, 
+             y = y_adj_last, yend = y_adj, 
+             colour = factor(catch), linetype = factor(score))) + 
+  geom_segment(arrow = arrow(length = unit(0.1,"cm")))
+
+geom_seg_simple + ggtitle("Where scores are thrown from and to") + labs(y= "Y width", x = "X length")
+
+geom_seg_bottom_third <- ulti_pbp_data %>% 
+  filter(y_last_cut_adj == "(-4.16e+03,-1.42e+03]") %>% 
+  sample_frac(0.05) %>% 
+  ggplot(aes(x = x_adj_last, xend = x_adj, 
+             y = y_adj_last, yend = y_adj)) + 
+  ylim(-4200,4200) + xlim(-4500, 4500) + 
+  geom_segment(arrow = arrow(length = unit(0.1,"cm")))
+
+geom_seg_bottom_third + ggtitle("Throws in the same third: bottom third") + labs(y= "Y width", x = "X length")
+```
+A sample of where a throw is thrown from and to in the same third.
+
+
+```{r}
+model_catch_simple_long <- glm(catch ~ same_third, data = ulti_pbp_data %>% filter(total_dist > 30), family = "binomial")
+summary(model_catch_simple_long)
+
+model_catch_simple_mid <- glm(catch ~ same_third, data = ulti_pbp_data %>% filter(total_dist > 20), family = "binomial")
+summary(model_catch_simple_mid)
+exp(-.68)
+
+model_full_catch <- glm(catch ~ total_dist + vert_dist + x_last_cut, data = ulti_pbp_data %>% filter(total_dist > 20), family = "binomial")
+model_full_catch_w_thirds <- glm(catch ~ same_third + total_dist + vert_dist + x_last_cut, data = ulti_pbp_data %>% filter(total_dist > 20), family = "binomial")
+
+AIC(model_full_catch)
+AIC(model_full_catch_w_thirds)
+summary(model_full_catch_w_thirds)
+```
+In ultimate frisbee, it is a general practice to not throw deep throws to a receiver in the same third of the field that the thrower is. This is because the thrower then has to curve the disc and get it around the defender that is presumably guarding the receiever and has a pretty good angle to get to the disc. Our findings show that in this dataset, that may not necessarily be the case. On throws over 20 yards in a model predicting whether or not its a catch and adjusting for total distance, vertical distance, and which section of the field (cut via the x coordinates) the disc is thrown from shows that same third throws and catches are not significant. The p-value is not significant at a 0.05 level (p-value = 0.22) and the AIC of the model with it is higher than the model without it.
+This is contrary to popular belief, however this result is not conclusive. As mentioned, the data is from a team of all star players -- some of the best in the country -- and therefore the throws they make are much better than the average college or highschool team. This does show however, that deep throws to players in the same third as where the thrower is are not always a bad idea if the talent is right.
+
+*** Something to note on same third throws: players cutting from outside to inside the same third is considered a pretty good cut usually? 
+
+  
+## Part IX: Conclusion on Final Results
+
+Conclusion of the project will go here...
+  -Briefly highlight the main findings from our data set
+  -Brielfy explain some explainations for some things that went wrong
+  -Discuss some steps that can be taken in the future to continue the growth of data analysis in ultimate frisbee
