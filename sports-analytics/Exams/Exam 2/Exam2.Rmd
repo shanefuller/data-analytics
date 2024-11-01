@@ -1,0 +1,346 @@
+---
+title: "Exam 2"
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing exams
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. You may not work with anyone else or seek help beyond the use of your notes, HW, labs
+
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+5. 11 AM is the deadline (Saturday)
+
+
+
+# Part I (20 total pts)
+
+Current Brewers analyst Dan Turkenkpf wrote an article titled [https://www.beyondtheboxscore.com/2008/4/5/389840/framing-the-debate](https://www.beyondtheboxscore.com/2008/4/5/389840/framing-the-debate), in which he outlines the idea of pitch framing in baseball.
+
+1. Identify three of the best catchers at framing according to the article. In the first table, what do each columns refer to?
+
+*The three best catchers at framing according to the article would be Gregg Zaun, Jeff Mathis, and Yadier Molina when not taking into account the unmpire skill. When including umpire skill, the three best catchers would be Gregg Zaun, Yadier Molina, and Russell Martin. Regarding the other columns in the first table, the catcher column refers to who is recieving the ball, the called pitches column refers to the total number of balls the catcher caught in total, the SAA column refers to strikes above average, which refers to essentially the effect that the catcher has on framing the ball to result in strikes for ambiguous pitches, SAA/150 pitches creates a ratio so that catchers who caught more balls are not rewarded or punished too heavily, and Runs/150 pitches refers to a metric that calculates the runs difference for a ball that is called a strike, which essentially shows on average how many runs a catcher is saving per 150 pitches by framing.*
+
+2. In the comment section, Dan identifies a correlation coefficient of 0.51 with respect to pitch framing (year over year). Given the size of the differences between pitchers, as well as this correlation coefficient, do you think pitch framing in 2008 was undervalued or overvalued by Major League Baseball officials?
+
+*The level of skill in baseball between pitchers has a pretty large range, even regarding the rotation on a single team. Dominate pitchers in the league often perform exceptionally, and pitchers who are not as successful are often responsible for allowing more hits, runs, and walks than their predecessors. With that being said, a correlation coefficient of 0.51 for pitch framing, a metric that could include plenty of noise with the pitchers that are throwing the ball, is pretty impressive, and is a valuable metric to consider when looking at defensively gifted catchers. Therefore, I would imagine that pitch framing was a metric that was undervalued by Major League Baseball officials in 2008, and I would hope work with the metric has only continued to grow.*
+
+
+Current Eagles analyst Namita Nandakumar proposed using a tool called survival analysis to assess the time that it takes NHL prospects to reach the NHL. See her slides at [https://hockeygraphsdotcom.files.wordpress.com/2017/10/namita.pdf](https://hockeygraphsdotcom.files.wordpress.com/2017/10/namita.pdf)
+
+3. Describe what's going on in the graph "Draft prospect survival curves, time until nth career NHL game". Specifically, identify:
+
+- Why is the red line below the purple line?
+- Roughly what fraction of players that were just drafted play the first game they possibly can?
+
+*The graph shown in the "Draft prospect survival curves, time until nth career NHL game", essentially shows how long it takes for the overall percentage of prospects to play a certain amount of games in the league. The red line shows when a specific percentage of draft prospects have played their first game, the green line shows when the percentage of draft prospects have played their 10th game, the blue line shows the same but for their 40th game, and the purple line shows up to their 80th game. The red line is below the purple line here because each colored line is based on the culumlation of the players in the lines below it. In other words, their will be no one in the purple line who already is not included in the red line, as players have to play their first game before they play their 80th game. Furthermore, looking at the inception of the red line, this appears to start at around 96%, suggesting that only 4% of prospects play in their first available games.*
+
+4. Namita writes that North American players have approximately a 35 percent decrease in the hazard ratio. What does this mean as far as drafting players goes? Are teams generally overvaluing or undervaluing North American players, relative to European ones?
+
+*Looking at the hazard ratio, it would appear that players from North America have a decrease of about 35 percent. In the context of this problem, this would mean that North American players are more likely to enter the league than European players. Therefore, this would mean that teams are generally undervaluing North American players in relation to the European players.*
+
+
+# Part 2 (40)
+
+The next part of the test will use our hockey shot data set.
+
+```{r}
+library(RCurl); library(tidyverse)
+gitURL<- "https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/pbp_data_hockey.rds"
+nhl_shots <- readRDS(gzcon(url(gitURL)))
+names(nhl_shots)
+dim(nhl_shots)
+```
+
+See our hockey unit for a description of each variable
+
+1. Identify the shooter who took the highest number of shots. 
+
+```{r}
+nhl_shots %>%
+  group_by(event_player_1) %>%
+  summarise(n_shots = n()) %>%
+  arrange(-n_shots)
+```
+
+*Alex Ovechkin took the most amount of shots with 1023 attempts.*
+
+2. Identify the goalie who faced the highest number of shots.
+
+```{r}
+nhl_shots %>%
+  group_by(ifelse((home_team == event_team), away_goalie, home_goalie)) %>%
+  summarise(n_att = n()) %>%
+  arrange(-n_att)
+```
+
+*Looking at shots faced by the opposite team, it would appear that Frederik Andersen faced the highest number of shots with 5824 attempted shots.*
+
+3. Describe differences in the likelihood of a goal based on shot type,  `event_detail`. 
+
+```{r}
+nhl_shots %>%
+  group_by(event_detail) %>%
+  summarise(prob_type = sum(shot_prob)/n()) %>%
+  arrange(-prob_type)
+
+nhl_shots %>%
+  group_by(event_detail) %>%
+  summarise(n_type = n()) %>%
+  arrange(-n_type)
+```
+
+*The most likely shot to go in is first listed as N/A, followed by a Tip-In, then followed by a Deflected shot. These answers would make sense, as Tip-In shots and Deflected shots are often very close to the goal, and can quickly change the path of the puck, causing difficulty for the goalie. An interesting point from the data is that there are only 16 N/A shots, which is most likely the largest contributor as to why it had the greatest liklihood of going in. Another interesting note is that wrist shots are far and away the most common shot, however they are only more likely to go in over Slap and Wrap-around shots.*
+
+4. A coach is interested in using the first 500 games of the season, and to use shooting percentages to predict shooting percentages over the remainder of the season (as well as the next season). The code below splits games at `game_id == 2017020500`, which is the 500th game of the season in 2017-2018. 
+
+```{r}
+first_shots <- filter(nhl_shots, game_id <= 2017020500)
+current_shots <- first_shots %>%
+  group_by(event_player_1) %>%
+  summarise(n_shots_past = n(), 
+            shot_p_past = mean(event_type == "GOAL")) %>%
+  filter(n_shots_past >= 150)
+
+future_shots <- nhl_shots %>% 
+  filter(game_id > 2017020500, event_player_1 %in% current_shots$event_player_1)%>%
+  group_by(event_player_1) %>%
+  summarise(n_shots_future = n(), 
+            shot_p_future = mean(event_type == "GOAL"))
+
+nhl_players <- current_shots %>% inner_join(future_shots)
+```
+
+
+
+Provide the coach with the following:
+
+i) 
+
+Two sets of estimates of the goal percentages for the remainder of the two seasons, the James-Stein estimate and the maximum likelihood estimate (MLE)
+
+```{r}
+p_bar <- mean(nhl_players$shot_p_past)
+p_bar
+
+p_hat <- nhl_players$shot_p_past
+p_hat
+
+sigma_sq <- sd(p_hat)^2
+sigma_sq
+
+c <- (nhl_players$n_shots_past/0.25)/(nhl_players$n_shots_past/0.25 + 1/sigma_sq)
+c
+
+nhl_players$Shp_MLE <- nhl_players$shot_p_past
+nhl_players$Shp_JS <- p_bar + c*(p_hat - p_bar)
+head(nhl_players)
+```
+
+*Above shows the two estimates listed as Shp_MLE and Shp_JS.*
+
+ii) 
+
+A comparison of the accuracy of each of your two sets of estimates. Use `shot_p_future` as the known truth regarding how well a player shoots. 
+
+```{r}
+nhl_players %>%
+  ungroup() %>%
+  mutate(abs_error_mle= abs(Shp_MLE - shot_p_future),
+         abs_error_js = abs(Shp_JS - shot_p_future)) %>%
+  summarise(mae_mle = mean(abs_error_mle),
+            mae_js = mean(abs_error_js))
+```
+
+*Above shows the Mean Absolute Error differences between the MLE model and the James Stein model. It appears that the James Stein model was more accurate at predicting future shooting percentages.*
+
+iii) 
+
+The relative amount of shrinkage towards the overall league average that a shooter can expect after roughly 175 shots. 
+
+```{r}
+nhl_players %>%
+  ungroup() %>%
+  mutate(shrinkage = abs(Shp_MLE - Shp_JS)) %>%
+  summarise(avg_shrinkage = mean(shrinkage))
+
+nhl_players
+```
+
+*The relative amount of shrinkage towards the overall league average that a shooter can expect is about a 0.0122 unit difference between the past shot probability and the James Stein estimation.*
+
+## (Bonus, 5 points)
+
+Visualize the James-Stein estimator with respect to past performance and eventual career performance for these players.
+
+```{r}
+new_data <- data.frame("Player" = c("ALEX.OVECHKIN", "ALEX.OVECHKIN", "ALEX.OVECHKIN", "BRENT.BURNS", "BRENT.BURNS", "BRENT.BURNS", "EVANDER.KANE", "EVANDER.KANE", "EVANDER.KANE", "JACK.EICHEL", "JACK.EICHEL", "JACK.EICHEL", "JEFF.SKINNER", "JEFF.SKINNER", "JEFF.SKINNER", "MAX.PACIORETTY", "MAX.PACIORETTY", "MAX.PACIORETTY", "NIKITA.KUCHEROV", "NIKITA.KUCHEROV", "NIKITA.KUCHEROV", "TYLER.SEGUIN", "TYLER.SEGUIN", "TYLER.SEGUIN", "VINCENT.TROCHECK", "VINCENT.TROCHECK", "VINCENT.TROCHECK", "VLADIMIR.TARASENKO", "VLADIMIR.TARASENKO", "VLADIMIR.TARASENKO"), "Estimator" = c("MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career", "MLE", "JS", "Career"), "Shooting_Pct" = c(0.10891089, 0.08842294, 0.09378806, 0.02857143, 0.05902344, 0.02989130, 0.08092486, 0.07744244, 0.07853403, 0.07096774, 0.07407573, 0.07317073, 0.07006369, 0.07376646, 0.09169550, 0.04519774, 0.06479850, 0.08333333, 0.12658228, 0.09236143, 0.09280000, 0.07692308, 0.07605963, 0.08516887, 0.07894737, 0.07665408, 0.05725971, 0.06862745, 0.07287864, 0.08873720))
+
+ggplot(data = new_data, aes(x = Estimator, y = Shooting_Pct, group=Estimator, color=Player)) + geom_point() + geom_path(aes(group=Player)) + xlab("Estimator") + ylab("Shooting Pct") + ggtitle("Visualizing the James Stein Estimator")
+```
+
+*This visualization took me a long time, and I am sure there was a more efficient way to do this. However, I think this ended up working okay. The only thing I could not figure out was how to switch the MLE and Career order, however I believe this still should work.*
+
+# Part 3 (30 points)
+
+```{r}
+url <- getURL("https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/sb_shot_data.csv")
+wwc_shot <- read.csv(text = url)
+names(wwc_shot)
+```
+
+1. Find the woman player for England (`possession_team.name == "England Women's"`) who had the best shooting performance of the tournament. That is, given each England shooters number of expected goals, which player overperformed the most?
+
+```{r}
+wwc_shot <- wwc_shot %>% 
+  mutate(is_goal = shot.outcome.name == "Goal")
+
+england_shot <- wwc_shot %>% 
+  filter(possession_team.name == "England Women's")
+
+england_shot %>%
+  group_by(player.name) %>% 
+  summarise(xg = sum(shot.statsbomb_xg), 
+            g = sum(is_goal), 
+            n_shots = n()) %>% 
+  mutate(ou = g-xg) %>% 
+  arrange(-ou)
+
+england_shot
+```
+
+*Looking at the data set, it appears that Ellen White overperformed the most on the England Women's team, as she scored 2.405 greater than expected.*
+
+2. Make a shot map for all shots from England's Ellen White (`player.name`), using a different symbol for whether or not each shot resulted in a goal. 
+
+```{r}
+ellen_white_shot_map <- wwc_shot %>% 
+  filter(player.name == "Ellen White")
+
+t1 <- ggplot(ellen_white_shot_map, aes(location.x, location.y, 
+      shape = is_goal, color = is_goal)) + 
+      geom_point()
+
+t1
+```
+
+*Above is the shot map for Ellen White, differentiated by which shots resulted in goals and which shots did not.*
+
+3. A coach wants an analyst to measure the likelihood of a goal. 
+
+```{r}
+library(splines)
+wwc_shot <- wwc_shot %>% 
+  mutate(is_goal = shot.outcome.name == "Goal")
+
+fit1 <- glm(is_goal ~ avevelocity + minute, data = wwc_shot, family = "binomial")
+fit2 <- glm(is_goal ~ ns(avevelocity, 5) + minute, data = wwc_shot, family = "binomial")
+fit3 <- glm(is_goal ~ avevelocity + ns(minute, 5), data = wwc_shot, family = "binomial")
+fit4 <- glm(is_goal ~ ns(avevelocity, 5) + ns(minute, 5), data = wwc_shot, family = "binomial")
+```
+
+Pick which of the models above makes the most sense to use to share with the coach.
+
+```{r}
+AIC(fit1)
+AIC(fit2)
+AIC(fit3)
+AIC(fit4)
+```
+
+*The coach should most like choose the second model, fit2. This is simply because when looking at the AIC values for each model, fit2 had the lowest of all four models.*
+
+4. What is the association between average velocity `avevelocity` and the likelihood of a goal? Several possible tools are usable here, including a look at the models above.
+
+```{r}
+summary(fit1)
+summary(fit2)
+summary(fit3)
+summary(fit4)
+```
+
+*When looking at the summary statistics for each of the models above, there are no significant values for any of the average velocity variables, including when the models were spliced on average velocity. Therefore, from looking at this it would appear that there is no strong association between the average velocity and whether or not the shot is a goal. From an outside perspective, this might appear surprising, however when looking at the games and observing what shots go in, there are some valid explanations to the lack of fit. Alluding back to an article that was discussed earlier, the ability of a good player to score was less about the players ability to finish, and more so regarded a players ability to get into a finishing position. This sentiment agrees with the findings above, suggesting that success is less about how well the player kicks it, and moreso about how well a player positions themselves. Furthermore, when watching soccer a majority of goals are delivered from instances like tip ins and deflections, which have a slower velocity than a fast strike taken from further back.*
+
+5. Use the Hosmer-Lemeshow test to assess `fit2` above. Is there any evidence of a lack of fit?
+
+```{r}
+tab_check <- wwc_shot %>%
+  mutate(shot_prob_cat = cut(shot.statsbomb_xg, 10)) %>%
+  group_by(shot_prob_cat) %>%
+  summarise(ave_exp_goals = sum(shot.statsbomb_xg),
+            ave_act_goals = sum(shot.outcome.name == "Goal"),
+            n_shots = n())
+
+tab_check <- tab_check %>%
+  mutate(diff_sq = (ave_exp_goals - ave_act_goals)^2/
+           ((ave_exp_goals)*(1-ave_exp_goals/n_shots)))
+
+tab_check
+
+hm_test <- tab_check %>%
+  summarise(test_stat = sum(diff_sq))
+
+hm_test
+
+1-pchisq(hm_test$test_stat, df = 8, lower.tail = TRUE)
+```
+
+*Looking at the value found from the Hosmer Lemeshow test, it would seem that we would accept the null hypothesis, suggesting that there is no lack of fit in the model.*
+
+# Part 4 (10 points)
+
+Use the home ice Bradley Terry model to answer the following questions
+
+
+```{r}
+library(broom)
+library(BradleyTerry2)
+head(icehockey)
+dim(icehockey)
+homeBT <- BTm(result,
+               data.frame(team = visitor, home.ice = 0),
+               data.frame(team = opponent, home.ice = home.ice),
+               ~ team + home.ice,
+               id = "team", data = icehockey)
+
+tidy(homeBT)
+tidy(homeBT) %>% tail()
+head(BTabilities(homeBT), 10)
+```
+
+
+1. Assuming team strength is held constant, what are the increased odds that the home team wins?
+
+```{r}
+exp(0.4028986)
+```
+
+*The odds of a team winning at home is 1.496 times higher than a neutral site, given a model with team strength.*
+
+2. Estimate the probability that Alabama Huntsville beating Air Force in 
+
+- a game with no home-ice advantage 
+- a game with Alabama Huntsville having home advantage
+- a game with Air Force having home advantage
+
+```{r}
+exp(-0.4490054)/(exp(-0.4490054)+exp(-1.1654793))
+exp(-0.4490054+0.4028986)/(exp(-0.4490054+0.4028986)+exp(-1.1654793))
+exp(-0.4490054)/(exp(-0.4490054)+exp(-1.1654793	+0.4028986))
+```
+
+*The probability of Alabama Huntsville beating Air Force on neutral ice would be 67.2%. The probability of Alabama Huntsville beating Air Force with Alabama Huntsville having home advantage would be 75.4%. The probability of Alabama Huntsville beating Air Force with Air Force having home advantage would be 57.8%.*        

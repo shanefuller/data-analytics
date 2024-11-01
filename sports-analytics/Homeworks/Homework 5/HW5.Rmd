@@ -1,0 +1,242 @@
+---
+title: 'HW 5: NFL kicker eval'
+author: "Shane Fuller (worked with Eli Koester)"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates. 
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+# Homework questions
+
+## Part I: Multiple regression and player metrics
+
+
+For this homework, we will be using data provided in the `nfl.kick` data set, as was done during class. Our goals will be to confirm our knowledge of logistic regression, our interpretations of slopes, as well as kicker-specific analysis. 
+
+```{r, eval FALSE}
+## Note: if using your personal computer, run `install.packages(RCurl)` 
+library(RCurl); library(tidyverse)
+url <- getURL("https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/nfl_fg.csv")
+nfl_kick <- read.csv(text = url)
+head(nfl_kick)
+```
+
+## Exploratory data analysis
+
+
+### Question 1
+
+Use R to find the **kicker** with the best percentage of successful field goals. Why might one argue that this specific kicker may not be the most accurate, even though he has the highest percentage? Return to your lab -- where we use `group_by()` and `summarize()` -- for suggested code. 
+
+```{r}
+kicker_success_rate <- nfl_kick %>% 
+  group_by(Kicker) %>% 
+  summarise(success_rate = mean(Success))
+
+kicker_success_rate <- kicker_success_rate[order(-kicker_success_rate$success_rate), ]
+kicker_success_rate
+
+nfl_kick %>% filter(Kicker == "Scifres")
+```
+
+*The kicker who had the best percentage of field goals is a kicker under the name of Scifres, with a 100% success rate. However, this kicker is most likely not the most accurate kicker, because they only appeared to kick one field goal in their career.*
+
+### Question 2
+
+Use R to find the **team** with the best percentage of successful field goals. Why might one argue that this team may not have had the best kickers even though they've posted the highest overall percentage?
+
+```{r}
+team_kicker_success_rate <- nfl_kick %>% 
+  group_by(Team) %>% 
+  summarise(success_rate = mean(Success), game_diff = mean(ScoreDiff))
+
+team_kicker_success_rate <- team_kicker_success_rate[order(-team_kicker_success_rate$success_rate), ]
+team_kicker_success_rate
+
+ggplot(data = nfl_kick, aes(Team, Distance)) + 
+  geom_boxplot() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+*The team that had the best percentage of field goals is the New England Patriots, with an 87.5% success rate. One argument someone might use towards the statement that they do not have the best kickers is under the fact that looking at the distribution of their field goal distance in relation to other teams, it seems a bit less. This could suggest that the Patriots are better at moving the ball down the field, which in turn allows the kickers to be given easier opportunities that kickers on opposing teams. Another argument is that the Patriots kicks have the largest average score differential, implying that the kickers are often in the lead when they are kicking. This would imply that they have less pressure, and therefore have easier kicks.*
+
+### Question 3
+
+Identify the teams that have kicked the highest percentage of their field goals on grass (recall: the `Grass` variable is a TRUE/FALSE indicator for whether or not each kick was kicked on a grass surface.).
+
+```{r}
+team_grass_kicker_rate <- nfl_kick %>% 
+  group_by(Team, Grass) %>% 
+  summarise(grass_rate = mean(Success))
+
+team_grass_kicker_rate <- team_grass_kicker_rate[order(-team_grass_kicker_rate$grass_rate), ]
+team_grass_kicker_rate
+```
+
+*The teams that seem to kick on grass fields the most would include the Buffalo Bills with 90.4%, the Baltimore Ravens with 87.1%, and the New York Chargers 86.4%.*
+
+## Logistic regression
+
+
+### Question 4
+
+Use the following code for the next several questions. 
+
+```{r}
+library(broom)
+fit_1 <- glm(Success ~ Distance + Grass + Year, 
+             data = nfl_kick, family = "binomial")
+tidy(fit_1)
+```
+
+
+Using the model above, interpret the coefficient for Grass on the odds scale
+
+*Given Distance and Year, the odds of a successsful kick on a grass field are about 0.845 times that of one kicked on turf.*
+
+### Question 5
+
+Using your model from (4), interpret the coefficient for `Distance` on the odds scale.
+
+*Given Surface and Year, the odds of a successsful kick from a given distance on the field are about 0.894 times that of one kicked on turf.*
+
+### Question 6
+
+
+Odds ratios are multiplicative. That is, if the odds of a successful outcome are $e^{\beta_1}$ given a one-unit increase in $x_1$, the odds of a successful outcome are $e^{c*\beta_1}$ given a $c$-unit increase in $x_1$. Given your model in (4) what are the odds of making a field goal that is 10 yards longer?
+
+```{r}
+exp(10*-0.1047)
+```
+*Given Surface and Year, the odds of a successful kick 10 yards further than a given distance on the field are about 0.351 times that of one kicked in the previous position.*
+
+### Question 7
+
+
+Estimate the probability of a successful 40-yard field goal, kicked on a non-grass surface in 2015.
+
+```{r}
+df_predict <- data.frame(Distance = c(40), 
+                         Grass = FALSE, 
+                         Year = 2015)
+
+pred_1 <- predict(fit_1, df_predict, type = "response")
+pred_1
+```
+
+*The probability of a successful kick with those parameters is about 87.9%.*
+
+## Expected points
+
+
+### Question 8
+
+
+Use your answer to Question (7) to estimate the expected points of a 40-yard field goal, kicked on a non-grass surface in 2015.
+
+```{r}
+round(pred_1, 2)*3
+```
+
+*The expected points with those parameters is about 2.64 points.*
+
+### Question 9
+
+
+Kicker A hits the field goal in Question (8) while Kicker B misses it. How many expected points has Kicker A added to his team given this single kick? How about Kicker B?
+
+*Kicker A added 0.36 expected points to his team, while Kicker B lost 2.64 expected points for his team.*
+
+### Question 10
+
+
+It is straightforward to estimate the value of kickers using expected points. 
+
+
+
+First, we generate predicted probabilities for each field goal using `fit_1`. Next, we use that to estimate the expected points for each field goal (`predict_points`). Finally, we use the result of the field goal (`Success` = 0 or a 1) and the value of the kick (3 points) to get an expected points added (`EPA`) for each kicker on each kick. 
+
+```{r}
+nfl_kick <- nfl_kick %>% 
+  mutate(predict_Success = predict(fit_1, nfl_kick, type = "response"),
+                   predict_points = 3*predict_Success, 
+                   EPA = Success*3 - predict_points)
+nfl_kick %>% head()
+```
+
+The first row corresponds to a David Akers kick in 2005. What was the predicted success rate for Akers on this kick?  What relative worth (in terms of `EPA`) did Akers provide on this kick?
+
+*The predicted success rate for Akers on this kick was about 0.621. Akers lost 1.864 expected points for his team.*
+
+### Question 11
+
+One metric we may be interested in is the relative worth, in terms of total `EPA`, among all kickers in our data set. The `dplyr` function makes it simple.
+
+
+```{r}
+options(dplyr.print_max = 1e9)
+kick_summary <- nfl_kick %>%
+  group_by(Kicker) %>%
+  summarize(percent_success = mean(Success), 
+            total_kicks = n(), 
+            total_EPA = sum(EPA)) %>%
+  arrange(total_EPA)
+kick_summary
+```
+
+The above function calculates kicker-specific percentages, each kicker's total number of kicks, and each kickers total EPA. 
+
+Since 2005, who has been worth the most (and least) total `EPA` to their teams?
+
+*The worst kicker was Cuniff with a total EPA of -41.796, while the best kicker was Bironas with a total EPA 37.203.*
+
+### Question 12
+
+Interpret the R-squared calculated below. What does it suggest about the fraction of unexplained variability when it comes to kicker EPA?
+
+```{r}
+kick_summary <- kick_summary %>% filter(total_kicks >= 50)
+ggplot(kick_summary, aes(percent_success, total_EPA)) + 
+  geom_point() 
+
+kick_summary %>% 
+  summarise(r2_epa_pct = cor(total_EPA, percent_success)^2)
+```
+
+*48.0% of the variability in total_EPA is explained by the change in the percent_success. This means that 52.0% of the variability in total_EPA is explained by chance and other variables.*
+
+### Question 13
+
+Given your readings, are there any other variables that you would want to account for when measuring field goal success that aren't in the current data set? How may it effect the ranking of kickers in Question Question (12)?
+
+*One variable that I would like to know is that whether or not it was raining at the time of the kick, or so know whether or not the weather was impacting the play. For example, if there was extreme whether conditions, but the field is in a dome, this is less interesting than if it snowing and the roof is open. A variable to say if inclement weather was a factor would be interesting, and I would expect this to make the kickers less successful. Another good variable to know would be whether or not the kick occured in the playoffs. Again, I would expect this to cause kicks to be less successful, as the pressure of a big kick in a big game could cause some players to miss.*
+
+## Question 14
+
+Make a better plot than the one shown above. Be creative!
+
+```{r}
+#install.packages("scatterplot3d")
+library(scatterplot3d)
+scatterplot3d(kick_summary[,1:3],
+              main="3D Scatter Plot",
+              xlab = "Total EPA",
+              ylab = "Percent Success",
+              zlab = "Total Kicks")
+```
+
+*One plot that I thought would be fun would be to look at a three dimensional scatter plot with all the varibales in kick_summary, excluding kicker. This allows the user to now see how the total number of kicks effect the graph, to see if there are any trends with more attempts versus less attempts.*

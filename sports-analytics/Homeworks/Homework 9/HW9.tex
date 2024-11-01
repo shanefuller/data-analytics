@@ -1,0 +1,605 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={HW 9: Soccer stats},
+            pdfauthor={Shane Fuller},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{HW 9: Soccer stats}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Shane Fuller}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Fall 2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{overview}{%
+\subsection{Overview}\label{overview}}
+
+In this HW, we'll look at women's world cup data (note -- several
+questions are similar to the most recent lab).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(RCurl)}
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\NormalTok{url <-}\StringTok{ }\KeywordTok{getURL}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/sb_shot_data.csv"}\NormalTok{)}
+\NormalTok{wwc_shot <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{text =}\NormalTok{ url)}
+\KeywordTok{names}\NormalTok{(wwc_shot)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{readings}{%
+\subsection{Readings}\label{readings}}
+
+Read xCommentary at \url{https://statsbomb.com/2016/10/xcommentary/}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  ``We have commentary that doesn't understand how the game actually
+  works.'' What specific example in soccer is he referring to?
+\end{enumerate}
+
+\emph{In the article, Knutson is referring to a shot that was taken in
+Premier League by Theo Walcott from 7 yards outside the box, off a
+half-volley, with his weak foot. Essentially commentators describe shots
+like this as opportunities that are expected to go in, when in reality a
+shot with those parameters is not expected to go in.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  ``Instead we get''distance run" stats, which to my knowledge have
+  never been proven as relevant to anything in football" -- Provide an
+  example of another sport where new or different statistics has been
+  provided, despite there being no obvious relevance to winning.
+\end{enumerate}
+
+\emph{The example that I have a relationship with is in the world of
+eSports. Essentially, although there are some diligent grassroots
+community members who are working hard to establish a data analytics
+field for their respective fields, I have found that often some of the
+data that has been gathered does not appear to have any relevance to
+winning. For example, in the game that I play competitvely, one metric
+that has been recorded recently is time spent on one side of the level,
+which has no real significance to whether or not a player is
+successful.}
+
+\hypertarget{better-shot-maps}{%
+\subsection{Better shot maps}\label{better-shot-maps}}
+
+\texttt{ggplot()} has ample ways to enhance shot maps. Consider the
+following maps
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{is_goal =}\NormalTok{ shot.outcome.name }\OperatorTok{==}\StringTok{ "Goal"}\NormalTok{)}
+
+\NormalTok{usa_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(possession_team.name }\OperatorTok{==}\StringTok{ "United States Women's"}\NormalTok{)}
+
+
+\NormalTok{p1 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(usa_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }
+
+\NormalTok{p2 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(usa_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }\DataTypeTok{colour =}\NormalTok{ is_goal)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }
+
+\NormalTok{p3 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(usa_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }
+      \DataTypeTok{colour =}\NormalTok{ is_goal, }\DataTypeTok{size =}\NormalTok{ shot.statsbomb_xg)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{p1}
+\NormalTok{p2}
+\NormalTok{p3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  What features are apparent in \texttt{p2} that aren't apparent in
+  \texttt{p1}? What features are apparent in \texttt{p3} that aren't
+  apparent in \texttt{p2}.
+\end{enumerate}
+
+\emph{The most helpful distinction between p1 and p2 is that p2 shows
+whether or not the shot attempt was a goal, while p1 simply just shows
+all of the shots taken. The most helpful distinction between p2 and p3
+is that p3 shows the relative shot distribution, meaning that p3 not
+only shows whether or not the shots were goals, but it also shows about
+how likely it is that those shots were expected to go in.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  The following contour plot creates lines where the team has shot in
+  highest densities. The inside line is most \texttt{dense},
+  corresponding to the center of where the team took shots. What
+  features are apparent in \texttt{p4} that aren't apparent in
+  \texttt{p3}? What is apparent in \texttt{p3} that isn't in
+  \texttt{p4}?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p4 <-}\StringTok{ }\NormalTok{usa_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(location.x, location.y)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{stat_density_2d}\NormalTok{()}
+\NormalTok{p4}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The most helpful distinction in p4 is that this plot allows for
+some useful binning in shot location density. This allows the user to
+visualize different regions on the field and combine them, rather than
+having scattered distributions. However, this plot does not provide any
+information about whether or not the shot was a goal, which is a
+valuable distinction that p3 offers.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Find another team
+  \texttt{wwc\_shot\ \%\textgreater{}\%\ count(possession\_team.name)}
+  and plot their shots. How do they compare to the USA Women's team?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{france_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(possession_team.name }\OperatorTok{==}\StringTok{ "France Women's"}\NormalTok{)}
+
+
+\NormalTok{f1 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(france_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }
+
+\NormalTok{f2 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(france_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }\DataTypeTok{colour =}\NormalTok{ is_goal)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }
+
+\NormalTok{f3 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(france_shot, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }
+      \DataTypeTok{colour =}\NormalTok{ is_goal, }\DataTypeTok{size =}\NormalTok{ shot.statsbomb_xg)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{f4 <-}\StringTok{ }\NormalTok{france_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(location.x, location.y)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{stat_density_2d}\NormalTok{()}
+
+\NormalTok{f1}
+\NormalTok{f2}
+\NormalTok{f3}
+\NormalTok{f4}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{From looking at the information provided in the first three
+graphs, it just seems that the United States simply made more goals than
+France, as there appears to be more blue on the US graph. Not only that,
+but it also seems that the US took more shots in general. Furthermore,
+looking at the last plot, it also seems that the US took better quality
+shots, as the bins show a desired pattern of the bulk of shots coming
+from the center and directly in front of the goal and spanning out,
+while France has a rather strange distribution of shots taken.}
+
+\hypertarget{goals-versus-expectation}{%
+\subsection{Goals versus expectation}\label{goals-versus-expectation}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Let's investigate finishing ability on the USA team. Calculate the
+  total number of goals scored by each player. Who actually scored the
+  most goals?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usa_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_goals =} \KeywordTok{sum}\NormalTok{(is_goal }\OperatorTok{==}\StringTok{ "TRUE"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_goals)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Alex Morgan and Megan Rapinoe had the most goals with 6 each.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Calculate the number of expected goals scored by each player. Who was
+  expected to score the most goals?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usa_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_ex_goals =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_ex_goals)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Megan Rapinoe was expected to score the most goals with an
+expected total of 3.95 goals.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  The code below (using \texttt{group\_by(),\ summarise(),\ mutate()}),
+  calculate the performance above/below expectation for each member of
+  the USA team who took a shot. Who performed better than expectation?
+  Below? What does the overall distribution say about the USA team?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usa_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{xg =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg), }
+            \DataTypeTok{g =} \KeywordTok{sum}\NormalTok{(is_goal), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ou =}\NormalTok{ g}\OperatorTok{-}\NormalTok{xg) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(ou)}
+
+\NormalTok{usa_shot}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The list of players that performed better than expected includes
+Alex Morgan, Rose Lavelle, and Megan Rapinoe. The list of players that
+performed worse than expected includes Crystal Alyssia Dunn, Tobin
+Heath, and Jessica McDonald. That being said, the only players who are
+in the negative are players that didn't score a single goal, otherwise
+every other player performed better than expected. Furthermore, the
+player who performed the ``worst'' is has a -0.292, which is barely
+below 0. Meanwhile, there are multiple players who performed almost a
+full goal better than expected, which is especially phenominal in a
+world cup. The USA Women's spread here is very impressive.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\tightlist
+\item
+  Annotate each line of code above to identify what it's doing.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# usa_shot %>%                                  # Getting the data set with only usa_shots}
+\CommentTok{#  group_by(player.name) %>%                    # Grouping the data set by individual player}
+\CommentTok{#  summarise(xg = sum(shot.statsbomb_xg),       # Getting a sum of the expected goals}
+\CommentTok{#            g = sum(is_goal),                  # Getting a sum of all successful goals}
+\CommentTok{#            n_shots = n()) %>%                 # Getting a sum of all attempted shots}
+\CommentTok{#  mutate(ou = g-xg) %>%                        # Creating new variable to see how they performed in relation to xg}
+\CommentTok{#  arrange(ou)                                  # Ordering the data set from least goals to most goals}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{practice-with-dplyr}{%
+\subsection{Practice with dplyr}\label{practice-with-dplyr}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{7}
+\tightlist
+\item
+  For each USA shooter, average the \texttt{TimeInPoss} and
+  \texttt{DefendersBehindBall} when they took their shot. Filter to make
+  sure you are only looking at players with at least 10 shots. What does
+  this say about how players took shots?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usa_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{ave_timeInPoss =}\NormalTok{ (}\KeywordTok{sum}\NormalTok{(TimeInPoss)}\OperatorTok{/}\KeywordTok{n}\NormalTok{()), }
+            \DataTypeTok{ave_defendersBehindBall =}\NormalTok{ (}\KeywordTok{sum}\NormalTok{(DefendersBehindBall)}\OperatorTok{/}\KeywordTok{n}\NormalTok{()), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(n_shots }\OperatorTok{>=}\StringTok{ }\DecValTok{10}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_shots)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{After looking at the data, I do not see any clear patterns in
+average time in possession and defenders behind the ball. However, the
+range of defenders behind ball is between about 3 and 5 defenders, and
+the time of possession seems to have a larger range, as that goes from 9
+seconds to 32 seconds. Alex Morgan and Carli Lloyd, who arguably had the
+two best world cup performances, both had around 3 defenders behind ball
+and around 20 seconds in possession time.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\tightlist
+\item
+  Among all players \texttt{wwc\_shot}, identify the player who finished
+  with the \emph{most} and \emph{least} goals above expectation.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{xg =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg), }
+            \DataTypeTok{g =} \KeywordTok{sum}\NormalTok{(is_goal), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ou =}\NormalTok{ g}\OperatorTok{-}\NormalTok{xg) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(ou)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The player that finished with the most goals over expected was
+Alex Morgan with 3.81 goals, while the player that finished with the
+least goals in relation to expected was Nikita Parris with -1.705
+goals.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{9}
+\tightlist
+\item
+  Among all goalies (\texttt{player.name.GK}), identify the goalie who
+  finished with the \emph{most} and \emph{least} goals allowed above
+  expectation.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name.GK) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{xg =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg), }
+            \DataTypeTok{g =} \KeywordTok{sum}\NormalTok{(is_goal), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ou =}\NormalTok{ g}\OperatorTok{-}\NormalTok{xg) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(ou)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The goalie that performed the best was Ingrid Hjelmseth, as she
+was expected to allow 8.201 goals, and only allowed 6 goals. Therefore,
+she saved 2.201 goals better than expected. The goalie that performed
+the worst was Sukanya Chor Charoenying , as she was expected to allow
+5.124 goals, and actually allowed 13 goals. Therefore, she saved 7.876
+goals worse than expected.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{10}
+\tightlist
+\item
+  Among all players, identify the player who took the most headers
+  (\texttt{shot.body\_part.name\ ==\ "Head"}).
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{headers =} \KeywordTok{sum}\NormalTok{(shot.body_part.name }\OperatorTok{==}\StringTok{ "Head"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{headers)}
+
+\NormalTok{wwc_shot}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The player who took the most headers was Samantha Kerr, and she
+attempted 8 headers throughout the tournament.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{11}
+\tightlist
+\item
+  Among all players, estimate the goal rate given different
+  \texttt{shot.technique.name}. Which of these tends to lead to have the
+  highest chance of success?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(shot.technique.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_goal =} \KeywordTok{sum}\NormalTok{(is_goal), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{(), }
+            \DataTypeTok{goal_rate =}\NormalTok{ n_goal}\OperatorTok{/}\NormalTok{n_shots) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{goal_rate)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{It seems that the overhead kick and the backheel had the highest
+proabability of going in for this world cup, while lobs and diving
+headers were the least successful in goal conversion rate.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{12}
+\tightlist
+\item
+  Compare the average shot distance by different play patterns
+  (\texttt{play\_pattern.name}) -- which plays tend to lead to shots
+  from longer distances? Shorter distances?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(play_pattern.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{ave_distance =}\NormalTok{ (}\KeywordTok{sum}\NormalTok{(DistToGoal)}\OperatorTok{/}\KeywordTok{n}\NormalTok{())) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{ave_distance)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{The plays tend to lead to longer shots include From Kick Off,
+Regular Play, and From Goal Kick. The plays that tend to lead to shorter
+shots would include Other, From Corner, and From Counter.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{13}
+\tightlist
+\item
+  Make a goalie map -- that is, find a goalie, and make a shot map (most
+  similar to \texttt{p3} above) that shows how the goalie fared in this
+  tournament. Pick any goalie you want!
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tochukwu_oluehi_shot_map <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(player.name.GK }\OperatorTok{==}\StringTok{ "Tochukwu Oluehi"}\NormalTok{)}
+
+\NormalTok{t1 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(tochukwu_oluehi_shot_map, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }
+      \DataTypeTok{colour =}\NormalTok{ is_goal, }\DataTypeTok{size =}\NormalTok{ shot.statsbomb_xg)) }\OperatorTok{+}\StringTok{ }
+\StringTok{      }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{t1}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exploration}{%
+\subsection{Exploration}\label{exploration}}
+
+A soccer coach wants to know the best places to shoot from. What would
+you tell the coach? Create a grid across the field using the
+\texttt{cut()} command (for both x and y), and then, within each
+location, estimate the goal rate. Next, use \texttt{geom\_tile()} to
+make a map of goal rates within each cell of the grid you created. For a
+reminder on \texttt{cut()}, see our notes on Hosmer-Lemeshow, or
+\texttt{?cut()}.
+
+
+\end{document}

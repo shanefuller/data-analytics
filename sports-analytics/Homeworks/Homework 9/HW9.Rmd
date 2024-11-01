@@ -1,0 +1,277 @@
+---
+title: 'HW 9: Soccer stats'
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, digits = 3, warning = FALSE)
+```
+
+
+## Overview
+
+In this HW, we'll look at women's world cup data (note -- several questions are similar to the most recent lab).
+
+```{r}
+library(RCurl)
+library(tidyverse)
+url <- getURL("https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/sb_shot_data.csv")
+wwc_shot <- read.csv(text = url)
+names(wwc_shot)
+```
+
+## Readings
+
+Read xCommentary at [https://statsbomb.com/2016/10/xcommentary/](https://statsbomb.com/2016/10/xcommentary/). 
+
+1. "We have commentary that doesn't understand how the game actually works." What specific example in soccer is he referring to?
+
+*In the article, Knutson is referring to a shot that was taken in Premier League by Theo Walcott from 7 yards outside the box, off a half-volley, with his weak foot. Essentially commentators describe shots like this as opportunities that are expected to go in, when in reality a shot with those parameters is not expected to go in.*
+
+2. "Instead we get "distance run" stats, which to my knowledge have never been proven as relevant to anything in football" -- Provide an example of another sport where new or different statistics has been provided, despite there being no obvious relevance to winning.
+
+*The example that I have a relationship with is in the world of eSports. Essentially, although there are some diligent grassroots community members who are working hard to establish a data analytics field for their respective fields, I have found that often some of the data that has been gathered does not appear to have any relevance to winning. For example, in the game that I play competitvely, one metric that has been recorded recently is time spent on one side of the level, which has no real significance to whether or not a player is successful.*
+
+## Better shot maps
+
+`ggplot()` has ample ways to enhance shot maps. Consider the following maps
+
+```{r}
+wwc_shot <- wwc_shot %>% 
+  mutate(is_goal = shot.outcome.name == "Goal")
+
+usa_shot <- wwc_shot %>% 
+  filter(possession_team.name == "United States Women's")
+
+
+p1 <- ggplot(usa_shot, aes(location.x, location.y)) + 
+  geom_point() 
+
+p2 <- ggplot(usa_shot, aes(location.x, location.y, colour = is_goal)) + 
+  geom_point() 
+
+p3 <- ggplot(usa_shot, aes(location.x, location.y, 
+      colour = is_goal, size = shot.statsbomb_xg)) + 
+  geom_point()
+
+p1
+p2
+p3
+```
+
+1. What features are apparent in `p2` that aren't apparent in `p1`?  What features are apparent in `p3` that aren't apparent in `p2`.
+
+*The most helpful distinction between p1 and p2 is that p2 shows whether or not the shot attempt was a goal, while p1 simply just shows all of the shots taken. The most helpful distinction between p2 and p3 is that p3 shows the relative shot distribution, meaning that p3 not only shows whether or not the shots were goals, but it also shows about how likely it is that those shots were expected to go in.*
+
+2. The following contour plot creates lines where the team has shot in highest densities. The inside line is most `dense`, corresponding to the center of where the team took shots. What features are apparent in `p4` that aren't apparent in `p3`? What is apparent in `p3` that isn't in `p4`?
+
+```{r}
+p4 <- usa_shot %>% 
+  ggplot(aes(location.x, location.y)) + 
+  stat_density_2d()
+p4
+```
+
+*The most helpful distinction in p4 is that this plot allows for some useful binning in shot location density. This allows the user to visualize different regions on the field and combine them, rather than having scattered distributions. However, this plot does not provide any information about whether or not the shot was a goal, which is a valuable distinction that p3 offers.*
+
+3. Find another team `wwc_shot %>% count(possession_team.name)` and plot their shots. How do they compare to the USA Women's team?
+
+```{r}
+france_shot <- wwc_shot %>% 
+  filter(possession_team.name == "France Women's")
+
+f1 <- ggplot(france_shot, aes(location.x, location.y)) + 
+  geom_point() 
+
+f2 <- ggplot(france_shot, aes(location.x, location.y, colour = is_goal)) + 
+  geom_point() 
+
+f3 <- ggplot(france_shot, aes(location.x, location.y, 
+      colour = is_goal, size = shot.statsbomb_xg)) + 
+  geom_point()
+
+f4 <- france_shot %>% 
+  ggplot(aes(location.x, location.y)) + 
+  stat_density_2d()
+
+f1
+f2
+f3
+f4
+```
+
+*From looking at the information provided in the first three graphs, it just seems that the United States simply made more goals than France, as there appears to be more blue on the US graph. Not only that, but it also seems that the US took more shots in general. Furthermore, looking at the last plot, it also seems that the US took better quality shots, as the bins show a desired pattern of the bulk of shots coming from the center and directly in front of the goal and spanning out, while France has a rather strange distribution of shots taken.*
+
+## Goals versus expectation
+
+4. Let's investigate finishing ability on the USA team. Calculate the total number of goals scored by each player. Who actually scored the most goals?
+
+```{r}
+usa_shot %>%
+  group_by(player.name) %>%
+  summarise(n_goals = sum(is_goal == "TRUE")) %>%
+  arrange(-n_goals)
+```
+
+*Alex Morgan and Megan Rapinoe had the most goals with 6 each.*
+
+5. Calculate the number of expected goals scored by each player. Who was expected to score the most goals?
+
+```{r}
+usa_shot %>%
+  group_by(player.name) %>%
+  summarise(n_ex_goals = sum(shot.statsbomb_xg)) %>%
+  arrange(-n_ex_goals)
+```
+
+*Megan Rapinoe was expected to score the most goals with an expected total of 3.95 goals.*
+
+6. The code below (using `group_by(), summarise(), mutate()`), calculate the performance above/below expectation for each member of the USA team who took a shot. Who performed better than expectation? Below?  What does the overall distribution say about the USA team?
+
+```{r, eval = FALSE}
+usa_shot %>%
+  group_by(player.name) %>% 
+  summarise(xg = sum(shot.statsbomb_xg), 
+            g = sum(is_goal), 
+            n_shots = n()) %>% 
+  mutate(ou = g-xg) %>% 
+  arrange(ou)
+
+usa_shot
+```
+
+*The list of players that performed better than expected includes Alex Morgan, Rose Lavelle, and Megan Rapinoe. The list of players that performed worse than expected includes Crystal Alyssia Dunn, Tobin Heath, and Jessica McDonald. That being said, the only players who are in the negative are players that didn't score a single goal, otherwise every other player performed better than expected. Furthermore, the player who performed the "worst" is has a -0.292, which is barely below 0. Meanwhile, there are multiple players who performed almost a full goal better than expected, which is especially phenominal in a world cup. The USA Women's spread here is very impressive.*
+
+7. Annotate each line of code above to identify what it's doing. 
+
+```{r}
+# usa_shot %>%                                  # Getting the data set with only usa_shots
+#  group_by(player.name) %>%                    # Grouping the data set by individual player
+#  summarise(xg = sum(shot.statsbomb_xg),       # Getting a sum of the expected goals
+#            g = sum(is_goal),                  # Getting a sum of all successful goals
+#            n_shots = n()) %>%                 # Getting a sum of all attempted shots
+#  mutate(ou = g-xg) %>%                        # Creating new variable to see how they performed in relation to xg
+#  arrange(ou)                                  # Ordering the data set from least goals to most goals
+```
+
+
+## Practice with dplyr
+
+8. For each USA shooter, average the `TimeInPoss` and `DefendersBehindBall` when they took their shot. Filter to make sure you are only looking at players with at least 10 shots. What does this say about how players took shots?
+
+```{r}
+usa_shot %>%
+  group_by(player.name) %>% 
+  summarise(ave_timeInPoss = (sum(TimeInPoss)/n()), 
+            ave_defendersBehindBall = (sum(DefendersBehindBall)/n()), 
+            n_shots = n()) %>% 
+  filter(n_shots >= 10) %>%
+  arrange(-n_shots)
+```
+
+*After looking at the data, I do not see any clear patterns in average time in possession and defenders behind the ball. However, the range of defenders behind ball is between about 3 and 5 defenders, and the time of possession seems to have a larger range, as that goes from 9 seconds to 32 seconds. Alex Morgan and Carli Lloyd, who arguably had the two best world cup performances, both had around 3 defenders behind ball and around 20 seconds in possession time.*
+
+9. Among all players `wwc_shot`, identify the player who finished with the *most* and *least* goals above expectation.
+
+```{r}
+wwc_shot %>%
+  group_by(player.name) %>% 
+  summarise(xg = sum(shot.statsbomb_xg), 
+            g = sum(is_goal), 
+            n_shots = n()) %>% 
+  mutate(ou = g-xg) %>% 
+  arrange(ou)
+```
+
+*The player that finished with the most goals over expected was Alex Morgan with 3.81 goals, while the player that finished with the least goals in relation to expected was Nikita Parris	with -1.705 goals.*
+
+10. Among all goalies (`player.name.GK`), identify the goalie who finished with the *most* and *least* goals allowed above expectation. 
+
+```{r}
+wwc_shot %>%
+  group_by(player.name.GK) %>% 
+  summarise(xg = sum(shot.statsbomb_xg), 
+            g = sum(is_goal), 
+            n_shots = n()) %>% 
+  mutate(ou = g-xg) %>% 
+  arrange(ou)
+```
+
+*The goalie that performed the best was Ingrid Hjelmseth, as she was expected to allow 8.201 goals, and only allowed 6 goals. Therefore, she saved 2.201 goals better than expected. The goalie that performed the worst was Sukanya Chor Charoenying	, as she was expected to allow 5.124 goals, and actually allowed 13 goals. Therefore, she saved 7.876 goals worse than expected.*
+
+11. Among all players, identify the player who took the most headers (`shot.body_part.name == "Head"`).
+
+```{r}
+wwc_shot %>%
+  group_by(player.name) %>% 
+  summarise(headers = sum(shot.body_part.name == "Head")) %>%
+  arrange(-headers)
+
+wwc_shot
+```
+
+*The player who took the most headers was Samantha Kerr, and she attempted 8 headers throughout the tournament.*
+
+12. Among all players, estimate the goal rate given different `shot.technique.name`. Which of these tends to lead to have the highest chance of success?
+
+```{r}
+wwc_shot %>%
+  group_by(shot.technique.name) %>% 
+  summarise(n_goal = sum(is_goal), 
+            n_shots = n(), 
+            goal_rate = n_goal/n_shots) %>%
+  arrange(-goal_rate)
+```
+
+*It seems that the overhead kick and the backheel had the highest proabability of going in for this world cup, while lobs and diving headers were the least successful in goal conversion rate.*
+
+13. Compare the average shot distance by different play patterns (`play_pattern.name`) -- which plays tend to lead to shots from longer distances? Shorter distances?
+
+```{r}
+wwc_shot %>%
+  group_by(play_pattern.name) %>% 
+  summarise(ave_distance = (sum(DistToGoal)/n())) %>%
+  arrange(-ave_distance)
+```
+
+*The plays tend to lead to longer shots include From Kick Off, Regular Play, and From Goal Kick. The plays that tend to lead to shorter shots would include Other, From Corner, and From Counter.*
+
+14. Make a goalie map -- that is, find a goalie, and make a shot map (most similar to `p3` above) that shows how the goalie fared in this tournament. Pick any goalie you want!
+
+```{r}
+tochukwu_oluehi_shot_map <- wwc_shot %>% 
+  filter(player.name.GK == "Tochukwu Oluehi")
+
+t1 <- ggplot(tochukwu_oluehi_shot_map, aes(location.x, location.y, 
+      colour = is_goal, size = shot.statsbomb_xg)) + 
+      geom_point()
+
+t1
+```
+
+
+## Exploration
+
+A soccer coach wants to know the best places to shoot from. What would you tell the coach?  Create a grid across the field using the `cut()` command (for both x and y), and then, within each location, estimate the goal rate. Next, use `geom_tile()` to make a map of goal rates within each cell of the grid you created. For a reminder on `cut()`, see our notes on Hosmer-Lemeshow, or `?cut()`.
+
+```{r}
+goal_distr <- wwc_shot %>%
+  mutate(location.x_cut = cut(location.x, 4),
+         location.y_cut = cut(location.y, 4)) %>%
+  group_by(location.x_cut, location.y_cut) %>% 
+  summarise(n_goal = sum(is_goal), 
+            n_shots = n(), 
+            goal_rate = n_goal/n_shots)
+
+goal_distr
+
+ggplot(data = goal_distr, aes(x = location.x_cut, y = location.y_cut)) + geom_tile(aes(fill = goal_rate))
+```
+
+
+*I would tell the coach that shots that are closer to the goal tend to have a better percentage of going in. Another interesting finding is that it seems that shots are more successful further up the field vertically than you would traditionally expect. I expect that this is maybe due to most players tending to be right footed, and shots primarily are coming from that position when people can kick with their dominant foot. But otherwise, information I would tell the coach information he probably already assumed by saying that shots that are closer to the goal tend to have a higher probability of going in.*

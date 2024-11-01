@@ -1,0 +1,332 @@
+---
+title: "Exam 1"
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, eval = TRUE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing exams
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. You may not work with anyone else or seek help beyond the use of your notes, HW, labs
+
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+5. Turn in a hard copy of your exam (stapled) to my mailbox by 12 noon on Tuesday. 
+
+
+
+# Part I (16 total pts)
+
+Beginning a few years ago, the National Basketball Association began to track *hustle stats*, as explained [here](http://espn.go.com/nba/story/_/id/15203926/nba-track-hustle-stats-playoffs-first). Read the article, and answer the following questions.
+
+
+
+## Question 1 (4 pts)
+ 
+Which *hustle stats* are the league going to record? 
+
+*A few of the new hustle stats that the league is looking to record includes contested shots, deflections by defensive players, charges taken, which players recover loose balls, and screen assists.*
+
+
+## Question 2 (8 pts) 
+
+Of the hustle stats, identify which metric you think is (i) most important to team success (ii) most a function of individual talent, and not team strategy and (iii) most repeatable. Justify your answers in one sentence each. Note that you can use the same metric more than once.
+
+*First, I would believe that screen assists would be most important to team success, as this is a metric that by relation is tied to made field goals, and we know that field goals is an extremely important metric in dictating success. Second, I believe that either contested shots or deflections by defensive players is probably the best measure of talent, as these stats often require plenty of focus and athletism to complete successfully. Third, I would assume that screen assists are most repeatable. I would say this because screens are often completed by centers and power forwards, no matter how late in their career they are. This is simply dependent on height and weight, which are arguably the most repaeatble metrics in basketball.*
+
+## Question 3 (4 pts)
+
+In our basketball readings section is an article on Goodhart's law: [https://www.vice.com/en_us/article/jp7xb3/moreyball-goodharts-law-and-the-limits-of-analytics](https://www.vice.com/en_us/article/jp7xb3/moreyball-goodharts-law-and-the-limits-of-analytics). What is Goodhart's law? And why might analysts want to think about Goodhart's Law as the NBA begins to track hustle stats?
+
+*Goodhart's law states that when a measure becomes a target, it ceases to be a good measure. Simply put, this means that if a group looks to prioritize a certain measure, this can negatively impact other measures around it. So for example, if players begin to prioritize the hustle stats found here like charges taken and loose balls recovered, this could result in the league becoming much more fast paced, and perhaps much more wild and out of order. The point being is that moving forward, it could be a negative to actively target some measures, and players might want to be aware of this as the NBA starts to measure hustle stas.*
+
+# Part II (24 total pts)
+
+
+We are going to use the NBA's shot-level data to look at the **two-point shots**. Here's the data you'll need to start. The variable `dist_cat` splits two-point shots into four categories: 0 to 3 feet, 4 to 6 feet, 
+
+```{r}
+library(RCurl)
+library(tidyverse)
+url <- getURL("https://raw.githubusercontent.com/JunWorks/NBAstat/master/shot.csv")
+nba_shot <- read.csv(text = url)
+nba_two <- na.omit(nba_shot)%>% 
+  filter(SHOT_DIST <=21 & PTS_TYPE==2, SHOT_DIST >= 0)
+nrow(nba_shot)
+nba_two <- nba_two %>%
+  mutate(dist_cat = cut(SHOT_DIST, breaks = c(-100, 3, 6, 12, 100), 
+                        labels = c("D1", "D2", "D3", "D4")), 
+         late_clock = SHOT_CLOCK < 5)
+
+```
+
+
+```{r}
+fit1 <- glm(FGM ~ dist_cat + SHOT_CLOCK, data = nba_two)
+fit2 <- glm(FGM ~ dist_cat + late_clock, data = nba_two)
+```
+
+## Question 1 (4 pts)
+
+Interpret the coefficient for `dist.catD2` in `fit1`, using the odds ratio scale. 
+
+```{r}
+library(broom)
+head(nba_two)
+tidy(fit1)
+```
+
+*Shots taken between four and six feet from the basket have an estimated -0.0797 times the odds of going in, relative to shots taken between zero and three feet from the basket, given a model including shot clock data.*
+
+
+## Question 2 (4 pts)
+
+What does `fit1` suggest about the chances of a two-point shot going in as a function of the shot clock?
+
+*Fit1 suggests that as there is more time on the shot clock when the shot was attempted, the shot is more likely to go in.*
+
+## Question 3 (4 pts)
+
+What does `fit2` suggest about the chances of a two-point shot going in as a function of the shot clock?
+
+```{r}
+library(broom)
+tidy(fit2)
+```
+
+*Fit2 suggests that shots taken with less than five seconds on the shot clock have an estimated -0.0729 times the odds of going in, relative to shots taken with more than five seconds left on the shot clock, given a model including shot distance data.*
+
+## Question 4 (4 pts)
+
+Both terms for the shot clock in `fit1` and `fit2` are significant. Provide one possible explanation for the discrepency you find above. 
+
+*The data shown above regarding shot clock data makes sense, as most often shots that are taken with less time on the clock are lower quality attempts, while shots taken with more time on the clock ususally tend to be better quality attempts. One interesting point that might impact the data is fast breaks, which are completely open shots that tend to happen with plenty of time on the shot clock.*
+
+## Question 5 (4 pts)
+
+For measuring the link between shot clock and success (given distance), would you prefer `fit1` or `fit2`? If you don't like either `fit1` or `fit2`, suggest an alternative model specification. *Note that you should not fit any additional models or provide any code here.*
+
+*Personally, I would prefer to look at the data provided in fit2. I would prefer this interpretation because in basketball, the success of a shot is heavily dependent on the shot quality. In relation to shot clock, this would imply that if their is more time on the shot clock when the shot was attempted, the players likely found a higher quality shot, as it is unlikely that a poor shot is attempted when the team could possibly find a better opportunity in the possession. Having said this, I believe that in the NBA, players still are capable of finding high quality shots when there is between 6 and 10 seconds on the clock, specifically with offenses trhat play at a slower pace. I believe that for all offenses though, if players are looking to shoot with less 5 seconds, this implies that there was just good defense, and the team was forced to put up an attempt. To simplify, I believe that fit2 does a better job at not punishing different types of offenses in its model.*
+
+
+## Question 6 (4 pts)
+
+Using `fit1`, estimate the expected point total for a 10 foot shot taken with 16 seconds left on the shot clock.
+
+```{r}
+exp = (-0.220*10)+(.005*16)+.569
+exp_points = exp*2
+exp_points
+```
+
+*The expected point total for a 10 foot shot taken with 16 seconds left on the shot clock is -3.102 points.*
+
+# Part III (4 pts each, 44 total)
+
+In the `Lahman` package, the `Fielding` data set contains information about how players performed defensively in each season. 
+
+We're particularly interested in the repeatability of fielding percentage, defined the number of total putouts (`PO`) and assists (`A`) divided by the number of opportunities a player had to field a ball (putouts, assists, and errors (`E`)). The following code identifies players with at least 100 attempts to field a ball between 1970 and 2000. 
+
+```{r}
+library(Lahman)
+Fielding_1 <- Fielding %>% 
+  mutate(fielding_attempts = PO + A + E, 
+         fpct = (PO + A)/fielding_attempts) %>% 
+  filter(fielding_attempts >= 100, yearID >= 1970, yearID <= 2000)
+```
+
+## Question 1
+
+Make a histogram of fielding percentage, and comment on its center, shape, and spread.
+
+```{r}
+ggplot(data = Fielding_1, aes(x = fpct)) + geom_histogram()
+```
+
+*To begin, the spread of fielding percentage seems to have a range of about 0.15, with a maximum of about 1.00, and a minimum of about 0.85. The shape of the histogram is heavily skewed right, with a majority of fielding percentages lying in above a 0.95 success rate. One interesting note on the shape in after around 0.99, there is a drop in the data, suggesting that most players with over 100 fielding attempts have at least 1 error. Regarding center, because of the skewed right shape of the histogram, it would seem that the center would lie around a 0.97 fielding percentage.*
+
+## Question 2 
+
+Compare the distributions of fielding percentage by each position (`POS`). What does this suggest about certain positions in baseball?
+
+```{r}
+ggplot(data = Fielding_1, aes(POS, fpct)) + 
+  geom_boxplot()
+```
+
+*When viewing the boxplots of fielding percentage based on position, it appears that third basemen seem to struggle the most with errors, as they are responsible for almost all entries of players with a fielding percentage 0.90 or lower, as well as having the lowest median of every position. On the other end of the spectrum, is appears that first basemen and catchers among the most consistent positions fielding percentage, as both only have a spread on about 0.94 to 1.00. This is heavily due to the putout metric, which records relatively low risk plays for these positions, which results in a high fielding percentage.*
+
+## Question 3
+
+Assess the repeatability of fielding percentage from one year to the next. That is, for each player, calculate their fielding percentage in the following season. Call each players' fielding percentage in the following season `fpct_next`. 
+
+```{r}
+Fielding_1 <- Fielding_1 %>% 
+  mutate(fpct_next = lead(fpct)) %>%
+  filter(!is.na(fpct_next)) 
+
+head(Fielding_1)
+```
+
+
+## Question 4
+
+Same as in **Question 3**, except calculate the repeatability of fielding percentage within each position. 
+
+```{r}
+Fielding_1 <- Fielding_1 %>% 
+  group_by(POS) %>% 
+  mutate(fpct_pos_next = lead(fpct)) %>%
+  filter(!is.na(fpct_pos_next)) %>%
+  ungroup()
+
+head(Fielding_1)
+```
+
+
+## Question 5
+
+Revisit our baseball readings and labs on repeatability. Where does fielding percentage rank, relative to batting and pitching metrics?
+
+```{r}
+ggplot(data = Fielding_1, aes(x = fpct, y = fpct_next)) + geom_point() + geom_smooth()
+```
+
+*Going back through the readings in the past, it seems that fielding percentage appears to be less repeatable than batting and pitching metrics. The correlation between fielding percentage from one year and fielding percentage in the next year seems less significant than correlations for batting and pitching metrics. One reason might be that for batting and pitching, these are actions that are much more consistent and have much less variance. However for fielding, there is more variance as to what the ball can do as soon as it leaves the bat, causing the metric to be less repeatable than other.*
+
+## Question 6
+
+Imagine fielding percentage had instead been nearly 100% repeatable -- that is, each player's fielding percentage stayed consistent across his or her career. Why might a baseball expert not neccesarily conclude that the players with the best fielding percentages were the players who were best defensively?
+
+*For something to be repeatable, this means that the the metric is reliant on some data point that does not often change. Therefore, if fielding perecentage was 100% repeatable across all players, this would imply that the consistency is less dependent on players talent defensively, which is a metric we know varies across all players over the course of their career, and is probably more dependent on a metric that stays consistent across a players career, whether it be position, or height, or weight, or any other metric that stays constant.*
+
+## Question 7
+
+Make a spaghetti plot of each player's fielding percentage, and facet by position. Can you identify any conclusions related to your findings in **Question 5**?
+
+```{r}
+ggplot(data = Fielding_1, aes(x = yearID, y = fpct, group = POS, colour=POS)) + geom_point() + geom_line()
+```
+
+*This spaghetti plot seems to agree with the conclusion found in problem 5. Although there are some positions that tend to stay somewhat consistent, there seems to be a relatively decent range in variance for some positions. For exmaple, the variance shown for third basemen is large, and there also seems to be a decent amount of movement for fielding percentage for pitchers as well. Although this metric is somewhat repeatable, it doesn't seem to be as repeatable as the hitting and pitching metrics that we discussed in previous readings.*
+
+## Question 8
+
+Roughly, what is the mean absolute error when using a players' fielding percentage in one year to predict his fielding percentage in the next year?
+
+```{r}
+Fielding_1 %>%
+  summarise(mae_p1 = mean(abs(fpct - fpct_next)))
+```
+
+*The mean absolute error when useing players' fielding percentage to predict is about 0.017.*
+
+## Question 9
+
+Fit a linear regression of `fpct_next` as a function of `fpct` and position. What is your estimated model?
+
+```{r}
+fpct_fit_1 <- lm(fpct_next ~ fpct + POS, data = Fielding_1)
+library(broom)
+tidy(fpct_fit_1)
+```
+
+*My estimated model shows fpct_next-hat = 0.939 + 0.0388(fpct-hat) - 0.002(POS2B-hat) + 0.002(POS3B-hat) + 0.001(POSC-hat) + 0.001(POSOF-hat) - 0.007(POSP-hat) + 0.002(POSSS-hat).*
+
+## Question 10
+
+Field the player-season with the lowest residual. What position did that player play?
+
+```{r}
+Fielding_1 <- Fielding_1 %>% 
+  mutate(fpct_resid = fpct_fit_1$residuals)
+
+Fielding_1 <- Fielding_1 %>% 
+  arrange(fpct_resid) 
+
+head(Fielding_1)
+```
+
+*The player with the lowest resdiual has the playerID of morgajo02, and he was a second basemen.*
+
+## Question 11
+
+Were the residuals from your fit normally distributed?
+
+```{r}
+qqnorm(fpct_fit_1$residuals)
+qqline(fpct_fit_1$residuals)
+```
+
+
+*Based on the QQ plot shown above, the residuals to not appear to normal distributed, as there is a clear slope to the line produced.*
+
+# Part IV (5 pts each, 15 total)
+
+## Question 1
+
+A coach is faced with a fourth down conversion attempt, 75 yards from his own goal. He looks at the following table of expected point totals and their conditional probabilities under two strategies - the coach goes for it or the coach kicks a field goal. Which decision will maximize this teams' expected points?
+
+
+| Go for it     | Field Goal    | Points|
+| ------------- |:-------------:| -----:|
+| 0.60          | 0.00          |     7 |
+| 0.20          | 0.80          |     3 |
+| 0.10          | 0.05          |    -3 |
+| 0.10          | 0.15          |    -7 |
+
+
+*The expected points if the coach decides to go for it is 3.8, while the expected points if they decide to kick a field goal is 1.1. Therefore, if the caoch is trying to maximize his teams expected points, then he should go for it.*
+
+
+## Question 2 
+
+Explain which strategy the team's coach should take under the minimax criterion, and why. 
+
+*The strategy for minimax in this case would be taking the strategy that would minimize the number of points the opponent would score. In this case, if we are looking at the points scored by the other team if the coach decides to go for it, the opponent is expected to net 1.0 point. If the coach decides to kick the field goal, the expected point total comes out to 1.2 points. Therefore, by the minimax rule, the optimal choice is again to go for it.*
+
+
+## Question 3 
+
+Go back to one of our readings - [the sabermetric manifesto](http://www.seanlahman.com/baseball-archive/sabermetrics/sabermetric-manifesto/). What about the sport of football makes it more difficult to achieve some of the general principles that the author discusses?  In that regard, why are field goal kickers among the easiest group to study?
+
+*The general idea is that in a sport like baseball, there is a very clear relationship between runs scored and runs allowed and wins and losses. Baseball has a relatively clear relationship to determine success, but more importantly, baseball has a much easier job at measuring the success of individual players and individual events. For a sport like football, where there is so much that goes on in a play that dictates success, it is hard to diferentiate individual success from the rest of the team success. Having said this, looking at the act of a kick in football, this is a metric that is relatively consistent, and can clearly measure an individuals performance. Whether or not a kick goes in is mostly reliant on the kicker, and therefore this allows for kickers to be an easy group to study.*
+
+
+## Write the Skidmore Honor Code (by hand, 1 point)
+
+While taking this examination, I have not witnessed any wrongdoing, nor have I personally violated any conditions of the Skidmore College Honor Code.
+
+# Bonus (5 pts)
+
+
+Recall our kicking data in the NFL
+
+```{r}
+url <- getURL("https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/nfl_fg.csv")
+nfl_kick <- read.csv(text = url)
+nfl_kick <- nfl_kick %>% 
+  mutate(Distance_sq = Distance^2)
+head(nfl_kick)
+fit_kick_1 <- glm(Success ~ Distance_sq + Distance + Grass + Year, 
+             data = nfl_kick, family = "binomial")
+```
+
+Estimate the odds of a kick going in if it's 5-yards further away using `fit_kick_1`. 
+
+```{r}
+tidy(fit_kick_1)
+```
+
+*Fit_kick_1 suggests that kicks taken 5-yards further away have an estimated -7.225 times the odds of going in, relative to kicks taken 5-yards closer, given a model including year and surface.*

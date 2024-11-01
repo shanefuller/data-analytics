@@ -1,0 +1,149 @@
+---
+title: 'HW 1: Baseball metrics using univariate and bivariate tools'
+author: "Shane Fuller (worked with Eli Koester)"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates. 
+
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+# Homework questions
+
+## Part I
+
+Return to the `Lahman` package in R, and we'll use the `teams_2016_batting` data frame that we organized in last week's lab.
+
+```{r, include=FALSE}
+library(tidyverse)
+library(Lahman)
+teams_2016 <- Teams %>% filter(yearID == 2016)
+teams_2016_batting <- teams_2016 %>% select (yearID:teamID, R:SF) 
+```
+
+
+1. Make an appropriate graph of team wins during this season. Is the distribution of wins skewed left, right, or symmetric? 
+
+```{r}
+teams_2016_wins <- teams_2016 %>% select (teamID, W)
+ggplot(data = teams_2016_wins, aes(x = W)) + geom_density()
+```
+
+*Judging by the density plot shown above, the number of wins appears to be relatively symmetric.*
+
+2. Teams play 162 games. Create a new variable, `win_pct`, which identifies the percent of games won by each team. Then, use the `filter` command to identify the winning percentage for the Chicago Cubs (teamID, `CHN`)
+
+```{r}
+teams_2016_win_pct <- teams_2016 %>% mutate(win_pct = W / G)
+cubs_win_pct <- teams_2016_win_pct %>% filter(teamID == "CHN") %>% select(win_pct)
+cubs_win_pct
+```
+
+*The Cubs appeared to have a win percentage of 0.636 in 2016.*
+
+3. Describe the center, shape, and spread of the `X3B` variable -- split by each league (lgID) -- using an appropriate plot.
+
+```{r}
+ggplot(data = teams_2016_batting, aes(x = lgID, y = X3B)) + geom_boxplot()
+```
+
+
+*First, the center described by the boxplot shows that the NL tended to have a greater median of triples over the AL. The median for the NL was around 33 triples, while the AL had about 25 triples. Regarding the shape, there is an interesting distinction between the NL and AL. The AL seems to have a left skew, while the NL seems to show a right skew. Regarding spread, both teams appear to have a range of about 30 triples, so both are relatively similar in this respect.*
+
+4. How can you change the x and y labels on your plots? How can you add a title? Use [google](www.google.com) to guide you, and update your plot in Question 3 with a new x-axis label, a new y-axis label, and a title. One trick: include `ggplot` in your google search.
+
+```{r}
+ggplot(data = teams_2016_batting, aes(x = lgID, y = X3B)) + geom_boxplot() + xlab("League") + ylab("Triples") + ggtitle("Triples in 2016 by League")
+```
+
+5. Moneyball was based on which team-statistics most strongly correlated to runs. Though there are some variables that already exist in the data, the code below creates batting average, on base percentage, and slugging percentage. 
+
+```{r, eval=TRUE}
+teams_2016_batting <- teams_2016_batting %>%
+  mutate(BA = (H/AB), 
+         OBP = (H + BB)/(AB + BB), 
+         SLG = ((H - X2B - X3B - HR)*1 + X2B*2 + X3B*3 + HR*4)/AB)
+```
+
+Using visual evidence, find the variable that you think seems to boast the strongest association to runs (`R`).
+
+```{r}
+teams_2016_batting_numeric <- select(teams_2016_batting, R, BA, OBP, SLG)
+correlation <- cor(teams_2016_batting_numeric)
+round(correlation, 3)
+```
+
+*Based on the visual evidence, it seems that slugging percentage boasts the strongest association to runs.*
+
+6. *Estimate* the correlation between (i) slugging percentage and runs, (ii) on base percentage and runs and (iii) batting average and runs. Which would you prioritize as a coach using these results? Why?
+
+*The correlation between slugging percentage and runs is about 0.85, the correlation between on base percentage and runs is about 0.80, and the correlation between batting average and runs is about 0.70. If I had to prioritize just one of these variables as a coach, I would be most interested in slugging percentage, as this variable seems to have the strongest association to scoring runs.*
+
+7. Create a new variable for whether or not a team won 85 games or more. You can call this variable whatever name you want. How many teams won 85 games or more? 
+
+```{r}
+teams_2016 <- teams_2016 %>% mutate(strong_team = (W >= 85))
+strong_teams_2016 <- teams_2016 %>% filter(strong_team == TRUE)
+strong_teams_2016 <- strong_teams_2016 %>% select(teamID, strong_team)
+strong_teams_2016
+```
+
+*There were 13 teams that won 85 games or more in 2016.*
+
+8.  A coach is curious if teams that steal more bases also hit more home runs. Make and describe a scatter plot of team home runs versus stolen bases. Then, add a title to your plot. Finally, add a smoothed trend line: you can do this by adding (`+geom_smooth()` to the end of your code.) You only need to show the final graph.
+
+```{r}
+ggplot(data = teams_2016, aes(x = SB, y = HR)) + geom_smooth() + xlab("Stolen Bases") + ylab("Home Runs") + ggtitle("Stolen Bases by Home Runs in 2016")
+```
+
+*It seems that the teams that tend to steal less bases have more home runs. Perhaps this is due to the fact that if teams hit more runs, they might have less people on base, resulting in less of an opportunity to steal. Also, maybe teams that have more home runs do not need to rely on more aggressive baserunning.*
+
+9. Make both a histogram and a boxplot of `hits`. What features are apparent in the histogram that aren't apparent in the boxplot? What features are apparent in the boxplot that aren't apparent in the histogram?
+
+```{r}
+ggplot(data = teams_2016_batting, aes(x = H)) + geom_histogram() + xlab("Hits") + ylab("Frequency") + ggtitle("Hits in 2016")
+
+ggplot(data = teams_2016_batting, aes(x = lgID, y = H)) + geom_boxplot() + xlab("League") + ylab("Hits") + ggtitle("Hits in 2016")
+```
+
+*The features that are best viewed through a histogram representation is by the overall distribution of hits. One helpful part of the histogram is that the user can view the single variable that is necessary for isolation. In this case, it is clear to see that hits follows a relatively normal distribution, with a few unusually high outliers. When using a boxplot, the plot requires that the variable by grouped by another variable, so in this case the hits were separated by league. Therefore, the boxplot is more helpful when the user wants to compare the same variable across multiple groups. From the boxplot that was created, it seemed that the AL had a larger median of hits, as well as the team with the most hits for the 2016 season.*
+
+10. Using a combination of the `arrange()`, `filter()`, and `select()` commands, find all teams since 2000 that were hit by a pitch (`HBP`) more than 100 times.
+
+```{r}
+teams_2000 <- Teams %>% filter(yearID >= 2000, HBP > 100)
+teams_2000
+```
+
+*The 2008 Cleveland Indians and the 2018 Tampa Bay Rays are the only two teams to have gotten hit by over 100 pitches since 2000.*
+
+## Part II
+
+Read Voros McCracken's "Pitching and Defense: How Much Control Do Hurlers Have?", provided [here](https://www.baseballprospectus.com/news/article/878/pitching-and-defense-how-much-control-do-hurlers-have/) and also on the reading page.
+
+1. What is McCracken's primary finding?
+
+*McCracken's primary finding is that hits allowed are not a particuarly meaningful statistic in the evaluation of pitchers.*
+
+2. Why would traditional baseball followers feel surprised with this result?
+
+*The primary goal of pitcher is to allow as few of runs as possible from the other team, and the best way for an opposing team to score runs is by getting hits. Therefore, the thesis that hits allowed are not a meaningful statistic in the evaluation of pitchers seems farfetched.* 
+
+3. What might one consider to supplement McCracken's analysis?
+
+*One consideration that might supplement McCracken's analysis is in the concept of meaningful hits, and the pitchers ability to avoid those. For example, there could be a pitcher that allows a hit every inning, but never allows those runners to score. Therefore, this pitcher would be considered dominate in the league with a low ERA, however he could hypothetically be a league leader in hits allowed. This consideration would contribute to McCracken's analysis, as it would appear in this case that the number of hits allowed in fact are not a meaningful statistic in the evalutaion of pitchers.*
+

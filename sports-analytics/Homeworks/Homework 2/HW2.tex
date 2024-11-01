@@ -1,0 +1,384 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={HW 2: Linear regression and prediction using MLB players},
+            pdfauthor={Stats and sports class},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{HW 2: Linear regression and prediction using MLB players}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Stats and sports class}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Fall 2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{preliminary-notes-for-doing-hw}{%
+\section{Preliminary notes for doing
+HW}\label{preliminary-notes-for-doing-hw}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  All files should be knit and compiled using R Markdown. Knit early and
+  often! I do not recommend waiting until the end of the HW to knit.
+\item
+  All questions should be answered completely, and, wherever applicable,
+  code should be included.
+\item
+  If you work with a partner or group, please write the names of your
+  teammates.
+\item
+  Copying and pasting of code is a violation of the Skidmore honor code
+\end{enumerate}
+
+\hypertarget{homework-questions}{%
+\section{Homework questions}\label{homework-questions}}
+
+\hypertarget{part-i-linear-regression-and-player-metrics}{%
+\subsection{Part I: Linear regression and player
+metrics}\label{part-i-linear-regression-and-player-metrics}}
+
+Return to the \texttt{Lahman} package in R, and we'll use the
+\texttt{Batting} data frame. Type \texttt{?Batting} for specific insight
+into each variable. Primarily, it's a table with 22 batting metrics.
+*For all questions, we'll be using the \texttt{Batting\_1} data frame.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\KeywordTok{library}\NormalTok{(Lahman)}
+\NormalTok{Batting_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\NormalTok{Batting }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(yearID }\OperatorTok{>=}\StringTok{ }\DecValTok{2000}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{ (playerID, yearID, AB}\OperatorTok{:}\NormalTok{SO) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(AB }\OperatorTok{>=}\StringTok{ }\DecValTok{500}\NormalTok{)}
+\NormalTok{Batting_}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the contents of \texttt{Batting\_1}: that is, provide its
+  dimensions, and what each row in the data set corresponds to.
+\end{enumerate}
+
+\emph{Batting\_1 is a dataset that contains the hitting metrics for all
+batters after the year 1999 with at least 500 at bats for that season.
+Each row corresponds to one player in one season, and includes relevant
+batting metrics such as runs, hits, walks, and strikeouts. In this
+dataset there are 2003 entries, and each row has 13 corresponding
+variables.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  When dealing with the \texttt{Teams} data set -- as in our labs and
+  prior homework -- we often filtered by year. In the \texttt{Batting}
+  data set, we are filtering by year and requiring an at-bat minimum.
+  Why is this second step often required when working with players but
+  not when working with teams?
+\end{enumerate}
+
+\emph{The second step is required on a player level because without
+filtering on a minimum number of at bats, this could result in plenty of
+extra rows that have the potential to skew the data. For example, in
+baseball minor league players are often brought up to play in the
+majors, and it is common that those players are not successful and they
+are sent back down to the minor leagues again. If this happens muliple
+times in a season for multiple teams, this could create a few hundred
+entries of players with very low and unhelpful values for data
+analysis.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Make a correlation matrix - both a matrix of the variables, as well as
+  a visualization -- using hits, doubles, triples, home runs, RBI, and
+  strikeouts.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Batting_}\DecValTok{1}\NormalTok{_numeric <-}\StringTok{ }\KeywordTok{select}\NormalTok{(Batting_}\DecValTok{1}\NormalTok{, H, X2B, X3B, HR, RBI, SO)}
+\NormalTok{correlation =}\StringTok{ }\KeywordTok{cor}\NormalTok{(Batting_}\DecValTok{1}\NormalTok{_numeric)}
+\KeywordTok{library}\NormalTok{(corrplot)}
+\KeywordTok{round}\NormalTok{(correlation, }\DecValTok{3}\NormalTok{)}
+\KeywordTok{corrplot}\NormalTok{(correlation, }\DataTypeTok{method =} \StringTok{"circle"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item
+  Make a scatter plot of runs batted in (RBI, the x-variable) and home
+  runs (HR, the x-variable). Estimate and write the regression line
+  using the \texttt{lm} command. Finally, interpret the slope and
+  intercept of this line.
+\item
+  Pete Alonso -- currently with the New York Mets -- has hit 47 home
+  runs and batted in 109 runs (as of Sept 15, 2019). Given his home
+  runs, what is his residual? That is, how many more or fewer runs
+  batted in has he hit than we'd expect given his home runs?
+\item
+  Alonso seems to have fewer runs batted in than we'd expect given his
+  home runs. Provide a few explanations for this is the case.
+\item
+  Return to your scatter plot of RBI versus HR. Use the
+  \texttt{annotate} command to add in a label (Alonso's name, or a
+  symbol) with where Alonso lies. Read more about \texttt{annotate}
+  here: \url{https://ggplot2.tidyverse.org/reference/annotate.html}.
+  Among players hitting Alonso's number of home runs, is his RBI total
+  surprising?
+\item
+  Run the following code:
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Batting_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\NormalTok{Batting_}\DecValTok{1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{K_rate =}\NormalTok{ SO}\OperatorTok{/}\NormalTok{(AB }\OperatorTok{+}\StringTok{ }\NormalTok{BB))}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ Batting_}\DecValTok{1}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ K_rate)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{()}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ Batting_}\DecValTok{1}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ K_rate, }\DataTypeTok{colour =}\NormalTok{ yearID, }\DataTypeTok{group =}\NormalTok{ yearID)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  what is \texttt{K\_rate}?
+\item
+  Describe the distribution of \texttt{K\_rate}: e.g, what is its
+  center, shape, and spread
+\item
+  Describe how \texttt{K\_rate} has changed over the last two decades.
+  Be precise. Have the center/shape/spread changed? If so, by how much?
+\end{itemize}
+
+\hypertarget{part-ii-predictability-of-player-metrics}{%
+\subsubsection{Part II: Predictability of player
+metrics}\label{part-ii-predictability-of-player-metrics}}
+
+In the above example, we looked at strikeout rate -- that is, the
+percentage of time that a player strikes out.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\tightlist
+\item
+  Read the article on baseball preditability here
+\end{enumerate}
+
+\url{https://blogs.fangraphs.com/basic-hitting-metric-correlation-1955-2012-2002-2012/}.
+
+What rate metrics in baseball are most repeatable? Which metrics are
+least repeatable?
+
+Let's assess the repeatability of the metrics in \texttt{Batting\_2},
+shown below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Batting_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{Batting_}\DecValTok{1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{HR_rate =}\NormalTok{ HR}\OperatorTok{/}\NormalTok{(AB }\OperatorTok{+}\StringTok{ }\NormalTok{BB), }
+         \DataTypeTok{BB_rate =}\NormalTok{ BB}\OperatorTok{/}\NormalTok{(AB }\OperatorTok{+}\StringTok{ }\NormalTok{BB), }
+         \DataTypeTok{RBI_rate =}\NormalTok{ RBI}\OperatorTok{/}\NormalTok{(AB }\OperatorTok{+}\StringTok{ }\NormalTok{BB))}
+
+\NormalTok{Batting_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{Batting_}\DecValTok{2} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(playerID, yearID) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(playerID) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{HR_rate_next =} \KeywordTok{lead}\NormalTok{(HR_rate), }
+         \DataTypeTok{K_rate_next =} \KeywordTok{lead}\NormalTok{(K_rate), }
+         \DataTypeTok{BB_rate_next =} \KeywordTok{lead}\NormalTok{(BB_rate), }
+         \DataTypeTok{RBI_rate_next =} \KeywordTok{lead}\NormalTok{(RBI_rate)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(HR_rate_next)) }
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Note:} The code drops the last year of a players' career -- there
+is no future variable to look at.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{9}
+\item
+  Use (i) scatter plots and (ii) correlation coefficients to assess the
+  year-over-year repeatability of strikeout rate, walk rate
+  (\texttt{BB\_rate}), HR rate, and RBI rate. That is, compare each
+  metric in a players' curret year to the metric that he records in the
+  following year. Which of these metrics is most repeatable? Which of
+  these is least repeatable?
+\item
+  We introduced two additional ways of assessing prediction error, mean
+  absolute error and mean squared error. Here's an example of how to
+  code these in R.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Batting_}\DecValTok{2} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{mae_k_rate =} \KeywordTok{mean}\NormalTok{(}\KeywordTok{abs}\NormalTok{(K_rate }\OperatorTok{-}\StringTok{ }\NormalTok{K_rate_next)), }
+            \DataTypeTok{mse_k_rate =} \KeywordTok{mean}\NormalTok{((K_rate }\OperatorTok{-}\StringTok{ }\NormalTok{K_rate_next)}\OperatorTok{^}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Interpret the \texttt{mae\_k\_rate} above. How does this number relate
+to the scatter plot (using \texttt{K\_rate}) in Question No.~10?
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{11}
+\item
+  Repeat the calculations in No.~11, only using \texttt{HR\_rate}
+  instead of \texttt{K\_rate}.
+\item
+  What does the following code show?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ Batting_}\DecValTok{2}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ yearID, }\DataTypeTok{y =}\NormalTok{ HR_rate)) }\OperatorTok{+}\StringTok{   }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ playerID), }\DataTypeTok{colour =} \StringTok{"grey"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ playerID), }\DataTypeTok{colour =} \StringTok{"grey"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{13}
+\tightlist
+\item
+  Repeat the code in No.~13, only for HR rate. Have hitters been hitting
+  less home runs with the increase in strikeouts?
+\end{enumerate}
+
+
+\end{document}

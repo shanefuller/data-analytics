@@ -1,0 +1,473 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Correlation and regression using the Lahman database for baseball},
+            pdfauthor={Michael Lopez, Skidmore College},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Correlation and regression using the Lahman database for baseball}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Michael Lopez, Skidmore College}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+\hypertarget{overview}{%
+\subsection{Overview}\label{overview}}
+
+In today's lab, we are going to explore parts of the Lahman package,
+while also linking to the statistical concepts in a bivariate analysis,
+including correlation, regression, and R-squared.
+
+First, load the libraries.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(Lahman)}
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+There is so much to the Lahman database, and in this course, we'll only
+touch the tip of the iceberg. First, scroll to the data frame list on
+the last page of the
+\href{https://cran.r-project.org/web/packages/Lahman/Lahman.pdf}{tutorial}.
+Under \textbf{Data sets}, there is a list of roughly 25 data sets that
+come with the Lahman package.
+
+You can also get a list of the data frames by entering the following
+command.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LahmanData}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Which data frames in the Lahman package has the largest number of
+  observations? Which have the fewest?
+\end{enumerate}
+
+We're going to start by using the \texttt{Teams} data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{(Teams)}
+\KeywordTok{head}\NormalTok{(Teams)}
+\KeywordTok{tail}\NormalTok{(Teams)}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{Teams} data contains team-level information for every year
+of baseball season, from 1871 - 2014. That's a lot of years! To make
+things a bit easier, we are going to focus on the modern era of
+baseball, which is generally considered to be the period from 1970
+onwards.
+
+Let's look at teams in the modern era, using the \texttt{filter()}
+command.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(Teams, yearID }\OperatorTok{>=}\StringTok{ }\DecValTok{1970}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(Teams_}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+We store the newer data set as \texttt{Teams\_1}, and you can tell
+\texttt{Teams\_1} is a smaller data set because it begins in 1970, and
+not 1871.
+
+Next, let's create a few missing team-level variables that we are going
+to need for the lab, using the \texttt{mutate()} command.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(Teams_}\DecValTok{1}\NormalTok{, }\DataTypeTok{X1B =}\NormalTok{ H }\OperatorTok{-}\StringTok{ }\NormalTok{X2B }\OperatorTok{-}\StringTok{ }\NormalTok{X3B }\OperatorTok{-}\StringTok{ }\NormalTok{HR, }
+                  \DataTypeTok{TB =}\NormalTok{ X1B }\OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{X2B }\OperatorTok{+}\StringTok{ }\DecValTok{3}\OperatorTok{*}\NormalTok{X3B }\OperatorTok{+}\StringTok{ }\DecValTok{4}\OperatorTok{*}\NormalTok{HR, }
+                  \DataTypeTok{RC =}\NormalTok{ (H }\OperatorTok{+}\StringTok{ }\NormalTok{BB)}\OperatorTok{*}\NormalTok{TB}\OperatorTok{/}\NormalTok{(AB }\OperatorTok{+}\StringTok{ }\NormalTok{BB),}
+                  \DataTypeTok{RC.new =}\NormalTok{ (H }\OperatorTok{+}\StringTok{ }\NormalTok{BB }\OperatorTok{-}\StringTok{ }\NormalTok{CS)}\OperatorTok{*}\NormalTok{(TB }\OperatorTok{+}\StringTok{ }\NormalTok{(}\FloatTok{0.55}\OperatorTok{*}\NormalTok{SB))}\OperatorTok{/}\NormalTok{(AB}\OperatorTok{+}\NormalTok{BB) )}
+\end{Highlighting}
+\end{Shaded}
+
+This creates four new team-level variables, \texttt{X1B} (number of
+singles), \texttt{TB} (total bases), \texttt{RC} (runs created), and
+\texttt{RC.new} (a newer runs created formula). The first formula for
+runs created is the basic one, discussed previously in lecture, while
+the second one uses a tweak for stolen bases.
+
+Notice that in the above code, the data name (\texttt{Teams\_1})
+remained unchanged. Alternatively, we could have created a new name
+(say, \texttt{Teams\_2}) if we had wanted.
+
+\hypertarget{bivariate-analysis}{%
+\subsection{Bivariate analysis}\label{bivariate-analysis}}
+
+\hypertarget{correlation-and-scatter-plots}{%
+\subsubsection{Correlation and scatter
+plots}\label{correlation-and-scatter-plots}}
+
+Using \texttt{Teams\_1}, let's quantify the strength, shape, and
+direction of the association between runs created and runs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ Teams_}\DecValTok{1}\NormalTok{, }\KeywordTok{aes}\NormalTok{(RC, R)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{Teams_}\DecValTok{1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{cor_var =} \KeywordTok{cor}\NormalTok{(R, RC))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  Repeat the analysis above (which uses runs created) using the newer
+  formula for runs created (\texttt{RC.new})
+\item
+  Which variable - \texttt{RC} or \texttt{RC.new} - shows a stronger
+  link with runs? What does this entail about the updated stolen bases
+  formula?
+\end{enumerate}
+
+Let's identify some additional ways of quantifying the association
+between two variables.
+
+As an example, let's look at the relationship between a team's home runs
+and its runs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{cor_var =} \KeywordTok{cor}\NormalTok{(R, HR), }
+            \DataTypeTok{r_sq =}\NormalTok{ cor_var}\OperatorTok{^}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Interpret the correlation coefficient and the R-squared values between
+  home runs and runs.
+\end{enumerate}
+
+\hypertarget{simple-linear-regression.}{%
+\subsubsection{Simple linear
+regression.}\label{simple-linear-regression.}}
+
+From introductory statistics, you'll remember the simple linear
+regression (SLR) equation. Recall, here's the estimated SLR fit:
+
+\begin{center} $\hat{y_i} = \hat{\beta_0} + \hat{\beta_1}*x_i$ \end{center}
+
+In the model above, \(\hat{y_i}\) represents our predicted value of an
+outcome variable given \(x_i\), while \(\hat{\beta_0}\) and
+\(\hat{\beta_1}\) are the estimated intercepts and slopes, respectively.
+
+In our example, we can plug in our variable names as follows:
+
+\begin{center} $\hat{R_i} = \hat{\beta_0} + \hat{\beta_1}*HR_i$ \end{center}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Make a scatter plot of \texttt{R} as a function of \texttt{HR}. Using
+  the function, make educated guesses for \(\hat{\beta_0}\) and
+  \(\hat{\beta_1}\).
+\end{enumerate}
+
+Fortunately, we don't have to make educated guesses. Let's look at the
+fit a model of runs as a function of home runs using the R command
+\texttt{lm()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(R }\OperatorTok{~}\StringTok{ }\NormalTok{HR, }\DataTypeTok{data =}\NormalTok{ Teams_}\DecValTok{1}\NormalTok{)}
+\KeywordTok{summary}\NormalTok{(fit_}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{summary()} code gives the regression output, as well as
+other model characteristics.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\item
+  Write the estimated regression line. Does the actual estimated
+  regression line resemble your guesses from question 5)?
+\item
+  Interpret both the intercept and the slope (for \texttt{HR}) in the
+  estimated regression equation. Is the intercept a useful term here?
+\item
+  Estimate the number of runs that a team with 250 home runs would
+  score. Alternatively, estimate how many home runs a team hit if they
+  scored 575 runs.
+\item
+  Is the link between home runs and runs significant? How can you tell?
+\item
+  Use a similar code to determine if there is there a significant linear
+  association between team runs (\texttt{R}) and the number of times
+  that team was caught stealing (\texttt{CS})?
+\end{enumerate}
+
+\hypertarget{analyzing-several-variables-simultaneously}{%
+\subsection{Analyzing several variables
+simultaneously}\label{analyzing-several-variables-simultaneously}}
+
+We close the lab by looking at how one would analyze a subset of
+variables to judge which are most strongly associated with team success.
+
+First, we use the \texttt{select()} command to reduce our data set from
+several dozen columns to only the ones we are interested in studying.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{Teams_}\DecValTok{1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(R, RC.new, RC, RA, HR, SO, attendance)}
+\end{Highlighting}
+\end{Shaded}
+
+Next, we calculate the pairwise correlation coefficient between each
+variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cor_matrix <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(Teams_}\DecValTok{2}\NormalTok{)}
+\NormalTok{cor_matrix}
+\KeywordTok{round}\NormalTok{(cor_matrix, }\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{10}
+\tightlist
+\item
+  Of the variables listed, which boast the strongest and weakest
+  correlations with runs scored? Sidenote: What does the
+  \texttt{round()} command do?
+\end{enumerate}
+
+This is a good time to point out that, as is usually the case with
+observational data like this, strong links between two variables do not
+entail that one variable causes the other. While hitting home-runs will
+likely cause teams to score more runs, it is not neccessarily the case
+that higher attendence causes teams to score more runs.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{11}
+\tightlist
+\item
+  Think of one reason why attendence and runs are significantly
+  correlated besides saying that attendence causes teams to score more
+  runs.
+\end{enumerate}
+
+\hypertarget{plotting-correlations}{%
+\subsubsection{Plotting correlations}\label{plotting-correlations}}
+
+There are lots of fun plots to make in R. Here are a few.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(corrplot)}
+\KeywordTok{corrplot}\NormalTok{(cor_matrix, }\DataTypeTok{method=}\StringTok{"number"}\NormalTok{)}
+\KeywordTok{corrplot}\NormalTok{(cor_matrix, }\DataTypeTok{method=}\StringTok{"circle"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"lower"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{repeatability}{%
+\subsection{Repeatability}\label{repeatability}}
+
+In addition to wanting a metric to correlate with success and to reflect
+individual talent, it is worth looking at how well a metric can predict
+a future, unknown performance.
+
+This requires some careful coding. Using the \texttt{dplyr} package, we
+create a new data frame, \texttt{Teams\_3}, which arranges the
+team-level data by franchise and year, and then calculates the number of
+runs scored in the following year as the variable \texttt{next.R}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{3}\NormalTok{ <-}\StringTok{ }\NormalTok{Teams_}\DecValTok{1} \OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(franchID, yearID) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(franchID) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{next_R =} \KeywordTok{lead}\NormalTok{(R))}
+\KeywordTok{head}\NormalTok{(Teams_}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{12}
+\tightlist
+\item
+  Verify that the last column of \texttt{Teams.2} contains the future
+  runs scored for each team in each row (hint: use the \texttt{select}
+  command)
+\end{enumerate}
+
+To close, we look at which team-level variables most strongly correlate
+with future runs scored.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams_}\DecValTok{3}\NormalTok{ <-}\StringTok{ }\NormalTok{Teams_}\DecValTok{3} \OperatorTok{%>%}\StringTok{ }\KeywordTok{ungroup}\NormalTok{() }\CommentTok{### Needed to remove grouping from earlier code}
+\NormalTok{Teams_}\DecValTok{4}\NormalTok{ <-}\StringTok{ }\NormalTok{Teams_}\DecValTok{3} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(next_R, R, RC, X1B, X2B, X3B, HR, SLG, OBP, OPS, attendance)}
+\NormalTok{cor_matrix <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(Teams_}\DecValTok{4}\NormalTok{, }\DataTypeTok{use=}\StringTok{"pairwise.complete.obs"}\NormalTok{)}
+\NormalTok{cor_matrix}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{13}
+\item
+  Which variables appear to be the best at predicting a team's runs
+  scored in the following year? Which appears to be the worst?
+\item
+  Related: Compare the correlation of number of singles (\texttt{X1B})
+  to \texttt{next.R} and \texttt{R}, as well as number of home runs
+  (\texttt{HR}) to \texttt{next.R} and \texttt{R}. Think carefully about
+  how this would impact your recommendations of how to build a team.
+  Which measures should be looked at most closely? Which measures appear
+  to be mostly noise?
+\item
+  For fun: Go to the Shiny app
+  \href{https://istats.shinyapps.io/guesscorr/}{here}. Take a few
+  guesses, and then click
+  \texttt{View\ scatterplot\ of\ correlation\ between\ your\ guesses\ and\ actual\ correlation}.
+  How good are you at guessing the correlation coefficient?
+\end{enumerate}
+
+
+\end{document}

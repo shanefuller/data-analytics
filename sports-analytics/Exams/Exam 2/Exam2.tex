@@ -1,0 +1,2027 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Exam 2},
+            pdfauthor={Shane Fuller},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Exam 2}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Shane Fuller}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Fall 2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{preliminary-notes-for-doing-exams}{%
+\section{Preliminary notes for doing
+exams}\label{preliminary-notes-for-doing-exams}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  All files should be knit and compiled using R Markdown. Knit early and
+  often! I do not recommend waiting until the end of the HW to knit.
+\item
+  All questions should be answered completely, and, wherever applicable,
+  code should be included.
+\item
+  You may not work with anyone else or seek help beyond the use of your
+  notes, HW, labs
+\item
+  Copying and pasting of code is a violation of the Skidmore honor code
+\item
+  11 AM is the deadline (Saturday)
+\end{enumerate}
+
+\hypertarget{part-i-20-total-pts}{%
+\section{Part I (20 total pts)}\label{part-i-20-total-pts}}
+
+Current Brewers analyst Dan Turkenkpf wrote an article titled
+\url{https://www.beyondtheboxscore.com/2008/4/5/389840/framing-the-debate},
+in which he outlines the idea of pitch framing in baseball.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Identify three of the best catchers at framing according to the
+  article. In the first table, what do each columns refer to?
+\end{enumerate}
+
+\emph{The three best catchers at framing according to the article would
+be Gregg Zaun, Jeff Mathis, and Yadier Molina when not taking into
+account the unmpire skill. When including umpire skill, the three best
+catchers would be Gregg Zaun, Yadier Molina, and Russell Martin.
+Regarding the other columns in the first table, the catcher column
+refers to who is recieving the ball, the called pitches column refers to
+the total number of balls the catcher caught in total, the SAA column
+refers to strikes above average, which refers to essentially the effect
+that the catcher has on framing the ball to result in strikes for
+ambiguous pitches, SAA/150 pitches creates a ratio so that catchers who
+caught more balls are not rewarded or punished too heavily, and Runs/150
+pitches refers to a metric that calculates the runs difference for a
+ball that is called a strike, which essentially shows on average how
+many runs a catcher is saving per 150 pitches by framing.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  In the comment section, Dan identifies a correlation coefficient of
+  0.51 with respect to pitch framing (year over year). Given the size of
+  the differences between pitchers, as well as this correlation
+  coefficient, do you think pitch framing in 2008 was undervalued or
+  overvalued by Major League Baseball officials?
+\end{enumerate}
+
+\emph{The level of skill in baseball between pitchers has a pretty large
+range, even regarding the rotation on a single team. Dominate pitchers
+in the league often perform exceptionally, and pitchers who are not as
+successful are often responsible for allowing more hits, runs, and walks
+than their predecessors. With that being said, a correlation coefficient
+of 0.51 for pitch framing, a metric that could include plenty of noise
+with the pitchers that are throwing the ball, is pretty impressive, and
+is a valuable metric to consider when looking at defensively gifted
+catchers. Therefore, I would imagine that pitch framing was a metric
+that was undervalued by Major League Baseball officials in 2008, and I
+would hope work with the metric has only continued to grow.}
+
+Current Eagles analyst Namita Nandakumar proposed using a tool called
+survival analysis to assess the time that it takes NHL prospects to
+reach the NHL. See her slides at
+\url{https://hockeygraphsdotcom.files.wordpress.com/2017/10/namita.pdf}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Describe what's going on in the graph ``Draft prospect survival
+  curves, time until nth career NHL game''. Specifically, identify:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Why is the red line below the purple line?
+\item
+  Roughly what fraction of players that were just drafted play the first
+  game they possibly can?
+\end{itemize}
+
+\emph{The graph shown in the ``Draft prospect survival curves, time
+until nth career NHL game'', essentially shows how long it takes for the
+overall percentage of prospects to play a certain amount of games in the
+league. The red line shows when a specific percentage of draft prospects
+have played their first game, the green line shows when the percentage
+of draft prospects have played their 10th game, the blue line shows the
+same but for their 40th game, and the purple line shows up to their 80th
+game. The red line is below the purple line here because each colored
+line is based on the culumlation of the players in the lines below it.
+In other words, their will be no one in the purple line who already is
+not included in the red line, as players have to play their first game
+before they play their 80th game. Furthermore, looking at the inception
+of the red line, this appears to start at around 96\%, suggesting that
+only 4\% of prospects play in their first available games.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Namita writes that North American players have approximately a 35
+  percent decrease in the hazard ratio. What does this mean as far as
+  drafting players goes? Are teams generally overvaluing or undervaluing
+  North American players, relative to European ones?
+\end{enumerate}
+
+\emph{Looking at the hazard ratio, it would appear that players from
+North America have a decrease of about 35 percent. In the context of
+this problem, this would mean that North American players are more
+likely to enter the league than European players. Therefore, this would
+mean that teams are generally undervaluing North American players in
+relation to the European players.}
+
+\hypertarget{part-2-40}{%
+\section{Part 2 (40)}\label{part-2-40}}
+
+The next part of the test will use our hockey shot data set.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(RCurl); }\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: bitops
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.2.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   1.0.0     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x tidyr::complete() masks RCurl::complete()
+## x dplyr::filter()   masks stats::filter()
+## x dplyr::lag()      masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gitURL<-}\StringTok{ "https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/pbp_data_hockey.rds"}
+\NormalTok{nhl_shots <-}\StringTok{ }\KeywordTok{readRDS}\NormalTok{(}\KeywordTok{gzcon}\NormalTok{(}\KeywordTok{url}\NormalTok{(gitURL)))}
+\KeywordTok{names}\NormalTok{(nhl_shots)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "season"         "game_id"        "game_date"      "session"       
+##  [5] "event_index"    "game_period"    "game_seconds"   "event_type"    
+##  [9] "home_team"      "away_team"      "home_skaters"   "away_skaters"  
+## [13] "home_score"     "away_score"     "event_detail"   "event_team"    
+## [17] "event_player_1" "event_player_2" "coords_x"       "coords_y"      
+## [21] "home_goalie"    "away_goalie"    "event_circle"   "event_distance"
+## [25] "event_angle"    "shot_prob"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(nhl_shots)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 221380     26
+\end{verbatim}
+
+See our hockey unit for a description of each variable
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Identify the shooter who took the highest number of shots.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_shots }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(event_player_}\DecValTok{1}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_shots)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1,051 x 2
+##    event_player_1     n_shots
+##    <chr>                <int>
+##  1 ALEX.OVECHKIN         1023
+##  2 BRENT.BURNS            911
+##  3 TYLER.SEGUIN           863
+##  4 NATHAN.MACKINNON       844
+##  5 PATRICK.KANE           821
+##  6 VLADIMIR.TARASENKO     790
+##  7 NIKITA.KUCHEROV        783
+##  8 BRENDAN.GALLAGHER      773
+##  9 DOUGIE.HAMILTON        746
+## 10 EVANDER.KANE           746
+## # ... with 1,041 more rows
+\end{verbatim}
+
+\emph{Alex Ovechkin took the most amount of shots with 1023 attempts.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Identify the goalie who faced the highest number of shots.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_shots }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(}\KeywordTok{ifelse}\NormalTok{((home_team }\OperatorTok{==}\StringTok{ }\NormalTok{event_team), away_goalie, home_goalie)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_att =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_att)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 117 x 2
+##    `ifelse((home_team == event_team), away_goalie, home_goalie)` n_att
+##    <chr>                                                         <int>
+##  1 FREDERIK.ANDERSEN                                              5824
+##  2 CONNOR.HELLEBUYCK                                              5618
+##  3 JOHN.GIBSON                                                    5254
+##  4 SERGEI.BOBROVSKY                                               5129
+##  5 DEVAN.DUBNYK                                                   5107
+##  6 HENRIK.LUNDQVIST                                               5035
+##  7 JACOB.MARKSTROM                                                5030
+##  8 ANDREI.VASILEVSKIY                                             5024
+##  9 BRADEN.HOLTBY                                                  4888
+## 10 JIMMY.HOWARD                                                   4760
+## # ... with 107 more rows
+\end{verbatim}
+
+\emph{Looking at shots faced by the opposite team, it would appear that
+Frederik Andersen faced the highest number of shots with 5824 attempted
+shots.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Describe differences in the likelihood of a goal based on shot type,
+  \texttt{event\_detail}.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_shots }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(event_detail) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{prob_type =} \KeywordTok{sum}\NormalTok{(shot_prob)}\OperatorTok{/}\KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{prob_type)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 8 x 2
+##   event_detail prob_type
+##   <chr>            <dbl>
+## 1 <NA>            0.349 
+## 2 Tip-In          0.106 
+## 3 Deflected       0.0987
+## 4 Backhand        0.0862
+## 5 Snap            0.0666
+## 6 Wrist           0.0645
+## 7 Wrap-around     0.0529
+## 8 Slap            0.0391
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_shots }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(event_detail) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_type =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{n_type)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 8 x 2
+##   event_detail n_type
+##   <chr>         <int>
+## 1 Wrist        115300
+## 2 Slap          36561
+## 3 Snap          30635
+## 4 Backhand      16675
+## 5 Tip-In        14817
+## 6 Deflected      5363
+## 7 Wrap-around    2013
+## 8 <NA>             16
+\end{verbatim}
+
+\emph{The most likely shot to go in is first listed as N/A, followed by
+a Tip-In, then followed by a Deflected shot. These answers would make
+sense, as Tip-In shots and Deflected shots are often very close to the
+goal, and can quickly change the path of the puck, causing difficulty
+for the goalie. An interesting point from the data is that there are
+only 16 N/A shots, which is most likely the largest contributor as to
+why it had the greatest liklihood of going in. Another interesting note
+is that wrist shots are far and away the most common shot, however they
+are only more likely to go in over Slap and Wrap-around shots.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  A coach is interested in using the first 500 games of the season, and
+  to use shooting percentages to predict shooting percentages over the
+  remainder of the season (as well as the next season). The code below
+  splits games at \texttt{game\_id\ ==\ 2017020500}, which is the 500th
+  game of the season in 2017-2018.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{first_shots <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(nhl_shots, game_id }\OperatorTok{<=}\StringTok{ }\DecValTok{2017020500}\NormalTok{)}
+\NormalTok{current_shots <-}\StringTok{ }\NormalTok{first_shots }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(event_player_}\DecValTok{1}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_shots_past =} \KeywordTok{n}\NormalTok{(), }
+            \DataTypeTok{shot_p_past =} \KeywordTok{mean}\NormalTok{(event_type }\OperatorTok{==}\StringTok{ "GOAL"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(n_shots_past }\OperatorTok{>=}\StringTok{ }\DecValTok{150}\NormalTok{)}
+
+\NormalTok{future_shots <-}\StringTok{ }\NormalTok{nhl_shots }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(game_id }\OperatorTok{>}\StringTok{ }\DecValTok{2017020500}\NormalTok{, event_player_}\DecValTok{1} \OperatorTok{%in%}\StringTok{ }\NormalTok{current_shots}\OperatorTok{$}\NormalTok{event_player_}\DecValTok{1}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(event_player_}\DecValTok{1}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{n_shots_future =} \KeywordTok{n}\NormalTok{(), }
+            \DataTypeTok{shot_p_future =} \KeywordTok{mean}\NormalTok{(event_type }\OperatorTok{==}\StringTok{ "GOAL"}\NormalTok{))}
+
+\NormalTok{nhl_players <-}\StringTok{ }\NormalTok{current_shots }\OperatorTok{%>%}\StringTok{ }\KeywordTok{inner_join}\NormalTok{(future_shots)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Joining, by = "event_player_1"
+\end{verbatim}
+
+Provide the coach with the following:
+
+\begin{enumerate}
+\def\labelenumi{\roman{enumi})}
+\item
+\end{enumerate}
+
+Two sets of estimates of the goal percentages for the remainder of the
+two seasons, the James-Stein estimate and the maximum likelihood
+estimate (MLE)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p_bar <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(nhl_players}\OperatorTok{$}\NormalTok{shot_p_past)}
+\NormalTok{p_bar}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.07557165
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p_hat <-}\StringTok{ }\NormalTok{nhl_players}\OperatorTok{$}\NormalTok{shot_p_past}
+\NormalTok{p_hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 0.10891089 0.02857143 0.08092486 0.07096774 0.07006369 0.04519774
+##  [7] 0.12658228 0.07692308 0.07894737 0.06862745
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sigma_sq <-}\StringTok{ }\KeywordTok{sd}\NormalTok{(p_hat)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{sigma_sq}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.0007763132
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{c <-}\StringTok{ }\NormalTok{(nhl_players}\OperatorTok{$}\NormalTok{n_shots_past}\OperatorTok{/}\FloatTok{0.25}\NormalTok{)}\OperatorTok{/}\NormalTok{(nhl_players}\OperatorTok{$}\NormalTok{n_shots_past}\OperatorTok{/}\FloatTok{0.25} \OperatorTok{+}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{sigma_sq)}
+\NormalTok{c}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 0.3854704 0.3520879 0.3494702 0.3249238 0.3277422 0.3546846 0.3291427
+##  [8] 0.3610860 0.3206514 0.3878069
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_players}\OperatorTok{$}\NormalTok{Shp_MLE <-}\StringTok{ }\NormalTok{nhl_players}\OperatorTok{$}\NormalTok{shot_p_past}
+\NormalTok{nhl_players}\OperatorTok{$}\NormalTok{Shp_JS <-}\StringTok{ }\NormalTok{p_bar }\OperatorTok{+}\StringTok{ }\NormalTok{c}\OperatorTok{*}\NormalTok{(p_hat }\OperatorTok{-}\StringTok{ }\NormalTok{p_bar)}
+\KeywordTok{head}\NormalTok{(nhl_players)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 7
+##   event_player_1 n_shots_past shot_p_past n_shots_future shot_p_future
+##   <chr>                 <int>       <dbl>          <int>         <dbl>
+## 1 ALEX.OVECHKIN           202      0.109             821        0.0938
+## 2 BRENT.BURNS             175      0.0286            736        0.0299
+## 3 EVANDER.KANE            173      0.0809            573        0.0785
+## 4 JACK.EICHEL             155      0.0710            574        0.0732
+## 5 JEFF.SKINNER            157      0.0701            578        0.0917
+## 6 MAX.PACIORETTY          177      0.0452            372        0.0833
+## # ... with 2 more variables: Shp_MLE <dbl>, Shp_JS <dbl>
+\end{verbatim}
+
+\emph{Above shows the two estimates listed as Shp\_MLE and Shp\_JS.}
+
+\begin{enumerate}
+\def\labelenumi{\roman{enumi})}
+\setcounter{enumi}{1}
+\item
+\end{enumerate}
+
+A comparison of the accuracy of each of your two sets of estimates. Use
+\texttt{shot\_p\_future} as the known truth regarding how well a player
+shoots.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_players }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{abs_error_mle=} \KeywordTok{abs}\NormalTok{(Shp_MLE }\OperatorTok{-}\StringTok{ }\NormalTok{shot_p_future),}
+         \DataTypeTok{abs_error_js =} \KeywordTok{abs}\NormalTok{(Shp_JS }\OperatorTok{-}\StringTok{ }\NormalTok{shot_p_future)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{mae_mle =} \KeywordTok{mean}\NormalTok{(abs_error_mle),}
+            \DataTypeTok{mae_js =} \KeywordTok{mean}\NormalTok{(abs_error_js))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 2
+##   mae_mle mae_js
+##     <dbl>  <dbl>
+## 1  0.0165 0.0118
+\end{verbatim}
+
+\emph{Above shows the Mean Absolute Error differences between the MLE
+model and the James Stein model. It appears that the James Stein model
+was more accurate at predicting future shooting percentages.}
+
+\begin{enumerate}
+\def\labelenumi{\roman{enumi})}
+\setcounter{enumi}{2}
+\item
+\end{enumerate}
+
+The relative amount of shrinkage towards the overall league average that
+a shooter can expect after roughly 175 shots.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_players }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{shrinkage =} \KeywordTok{abs}\NormalTok{(Shp_MLE }\OperatorTok{-}\StringTok{ }\NormalTok{Shp_JS)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{avg_shrinkage =} \KeywordTok{mean}\NormalTok{(shrinkage))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##   avg_shrinkage
+##           <dbl>
+## 1        0.0122
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nhl_players}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 7
+##    event_player_1 n_shots_past shot_p_past n_shots_future shot_p_future
+##    <chr>                 <int>       <dbl>          <int>         <dbl>
+##  1 ALEX.OVECHKIN           202      0.109             821        0.0938
+##  2 BRENT.BURNS             175      0.0286            736        0.0299
+##  3 EVANDER.KANE            173      0.0809            573        0.0785
+##  4 JACK.EICHEL             155      0.0710            574        0.0732
+##  5 JEFF.SKINNER            157      0.0701            578        0.0917
+##  6 MAX.PACIORETTY          177      0.0452            372        0.0833
+##  7 NIKITA.KUCHER~          158      0.127             625        0.0928
+##  8 TYLER.SEGUIN            182      0.0769            681        0.0852
+##  9 VINCENT.TROCH~          152      0.0789            489        0.0573
+## 10 VLADIMIR.TARA~          204      0.0686            586        0.0887
+## # ... with 2 more variables: Shp_MLE <dbl>, Shp_JS <dbl>
+\end{verbatim}
+
+\emph{The relative amount of shrinkage towards the overall league
+average that a shooter can expect is about a 0.0122 unit difference
+between the past shot probability and the James Stein estimation.}
+
+\hypertarget{bonus-5-points}{%
+\subsection{(Bonus, 5 points)}\label{bonus-5-points}}
+
+Visualize the James-Stein estimator with respect to past performance and
+eventual career performance for these players.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{new_data <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Player"}\NormalTok{ =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"ALEX.OVECHKIN"}\NormalTok{, }\StringTok{"ALEX.OVECHKIN"}\NormalTok{, }\StringTok{"ALEX.OVECHKIN"}\NormalTok{, }\StringTok{"BRENT.BURNS"}\NormalTok{, }\StringTok{"BRENT.BURNS"}\NormalTok{, }\StringTok{"BRENT.BURNS"}\NormalTok{, }\StringTok{"EVANDER.KANE"}\NormalTok{, }\StringTok{"EVANDER.KANE"}\NormalTok{, }\StringTok{"EVANDER.KANE"}\NormalTok{, }\StringTok{"JACK.EICHEL"}\NormalTok{, }\StringTok{"JACK.EICHEL"}\NormalTok{, }\StringTok{"JACK.EICHEL"}\NormalTok{, }\StringTok{"JEFF.SKINNER"}\NormalTok{, }\StringTok{"JEFF.SKINNER"}\NormalTok{, }\StringTok{"JEFF.SKINNER"}\NormalTok{, }\StringTok{"MAX.PACIORETTY"}\NormalTok{, }\StringTok{"MAX.PACIORETTY"}\NormalTok{, }\StringTok{"MAX.PACIORETTY"}\NormalTok{, }\StringTok{"NIKITA.KUCHEROV"}\NormalTok{, }\StringTok{"NIKITA.KUCHEROV"}\NormalTok{, }\StringTok{"NIKITA.KUCHEROV"}\NormalTok{, }\StringTok{"TYLER.SEGUIN"}\NormalTok{, }\StringTok{"TYLER.SEGUIN"}\NormalTok{, }\StringTok{"TYLER.SEGUIN"}\NormalTok{, }\StringTok{"VINCENT.TROCHECK"}\NormalTok{, }\StringTok{"VINCENT.TROCHECK"}\NormalTok{, }\StringTok{"VINCENT.TROCHECK"}\NormalTok{, }\StringTok{"VLADIMIR.TARASENKO"}\NormalTok{, }\StringTok{"VLADIMIR.TARASENKO"}\NormalTok{, }\StringTok{"VLADIMIR.TARASENKO"}\NormalTok{), }\StringTok{"Estimator"}\NormalTok{ =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{, }\StringTok{"MLE"}\NormalTok{, }\StringTok{"JS"}\NormalTok{, }\StringTok{"Career"}\NormalTok{), }\StringTok{"Shooting_Pct"}\NormalTok{ =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.10891089}\NormalTok{, }\FloatTok{0.08842294}\NormalTok{, }\FloatTok{0.09378806}\NormalTok{, }\FloatTok{0.02857143}\NormalTok{, }\FloatTok{0.05902344}\NormalTok{, }\FloatTok{0.02989130}\NormalTok{, }\FloatTok{0.08092486}\NormalTok{, }\FloatTok{0.07744244}\NormalTok{, }\FloatTok{0.07853403}\NormalTok{, }\FloatTok{0.07096774}\NormalTok{, }\FloatTok{0.07407573}\NormalTok{, }\FloatTok{0.07317073}\NormalTok{, }\FloatTok{0.07006369}\NormalTok{, }\FloatTok{0.07376646}\NormalTok{, }\FloatTok{0.09169550}\NormalTok{, }\FloatTok{0.04519774}\NormalTok{, }\FloatTok{0.06479850}\NormalTok{, }\FloatTok{0.08333333}\NormalTok{, }\FloatTok{0.12658228}\NormalTok{, }\FloatTok{0.09236143}\NormalTok{, }\FloatTok{0.09280000}\NormalTok{, }\FloatTok{0.07692308}\NormalTok{, }\FloatTok{0.07605963}\NormalTok{, }\FloatTok{0.08516887}\NormalTok{, }\FloatTok{0.07894737}\NormalTok{, }\FloatTok{0.07665408}\NormalTok{, }\FloatTok{0.05725971}\NormalTok{, }\FloatTok{0.06862745}\NormalTok{, }\FloatTok{0.07287864}\NormalTok{, }\FloatTok{0.08873720}\NormalTok{))}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ new_data, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Estimator, }\DataTypeTok{y =}\NormalTok{ Shooting_Pct, }\DataTypeTok{group=}\NormalTok{Estimator, }\DataTypeTok{color=}\NormalTok{Player)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_path}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group=}\NormalTok{Player)) }\OperatorTok{+}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Estimator"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Shooting Pct"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Visualizing the James Stein Estimator"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Exam2_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\emph{This visualization took me a long time, and I am sure there was a
+more efficient way to do this. However, I think this ended up working
+okay. The only thing I could not figure out was how to switch the MLE
+and Career order, however I believe this still should work.}
+
+\hypertarget{part-3-30-points}{%
+\section{Part 3 (30 points)}\label{part-3-30-points}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{url <-}\StringTok{ }\KeywordTok{getURL}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/sb_shot_data.csv"}\NormalTok{)}
+\NormalTok{wwc_shot <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{text =}\NormalTok{ url)}
+\KeywordTok{names}\NormalTok{(wwc_shot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "period"               "minute"               "second"              
+##  [4] "possession"           "duration"             "possession_team.name"
+##  [7] "play_pattern.id"      "play_pattern.name"    "player.id"           
+## [10] "player.name"          "position.name"        "shot.statsbomb_xg"   
+## [13] "shot.first_time"      "shot.technique.name"  "shot.outcome.name"   
+## [16] "shot.type.name"       "shot.body_part.name"  "match_id"            
+## [19] "location.x"           "location.y"           "location.x.GK"       
+## [22] "location.y.GK"        "player.name.GK"       "DistToGoal"          
+## [25] "DistToKeeper"         "AngleToGoal"          "avevelocity"         
+## [28] "distance.ToD1"        "DefendersBehindBall"  "TimeInPoss"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Find the woman player for England
+  (\texttt{possession\_team.name\ ==\ "England\ Women\textquotesingle{}s"})
+  who had the best shooting performance of the tournament. That is,
+  given each England shooters number of expected goals, which player
+  overperformed the most?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wwc_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{is_goal =}\NormalTok{ shot.outcome.name }\OperatorTok{==}\StringTok{ "Goal"}\NormalTok{)}
+
+\NormalTok{england_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(possession_team.name }\OperatorTok{==}\StringTok{ "England Women's"}\NormalTok{)}
+
+\NormalTok{england_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(player.name) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{xg =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg), }
+            \DataTypeTok{g =} \KeywordTok{sum}\NormalTok{(is_goal), }
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ou =}\NormalTok{ g}\OperatorTok{-}\NormalTok{xg) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\OperatorTok{-}\NormalTok{ou)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 18 x 5
+##    player.name             xg     g n_shots      ou
+##    <fct>                <dbl> <int>   <int>   <dbl>
+##  1 Ellen White         3.59       6      18  2.41  
+##  2 Alex Greenwood      0.0808     1       3  0.919 
+##  3 Lucy Bronze         0.130      1       4  0.870 
+##  4 Francesca Kirby     0.175      1       4  0.825 
+##  5 Stephanie Houghton  0.909      1       5  0.0915
+##  6 Yuika Sugasawa      0.0125     0       1 -0.0125
+##  7 Jill Scott          1.01       1      13 -0.0139
+##  8 Karen Julia Carney  0.0222     0       2 -0.0222
+##  9 Erin Cuthbert       0.0379     0       1 -0.0379
+## 10 Keira Walsh         0.0449     0       3 -0.0449
+## 11 Jade Moore          0.0943     0       4 -0.0943
+## 12 Julia Zigiotti-Olme 0.125      0       1 -0.125 
+## 13 Georgia Stanway     0.220      0       8 -0.220 
+## 14 Toni Duggan         0.247      0       3 -0.247 
+## 15 Rachel Daly         0.317      0       1 -0.317 
+## 16 Bethany Mead        0.325      0       3 -0.325 
+## 17 Jodie Taylor        1.65       1       6 -0.648 
+## 18 Nikita Parris       2.71       1      10 -1.71
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{england_shot}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    period minute second possession duration possession_team.name
+## 1       1     10     42         23 0.991300      England Women's
+## 2       1     13      6         24 0.624900      England Women's
+## 3       1     18     31         34 0.812900      England Women's
+## 4       1     21     19         37 0.424100      England Women's
+## 5       1     32      5         60 0.438300      England Women's
+## 6       1     33     57         65 0.833500      England Women's
+## 7       1     39     24         79 0.960000      England Women's
+## 8       1     41     29         81 1.552173      England Women's
+## 9       1     44     37         86 2.951219      England Women's
+## 10      1     46     54         89 1.214000      England Women's
+## 11      2     49      5        100 1.177536      England Women's
+## 12      2     55     51        112 0.766500      England Women's
+## 13      2     69     58        146 0.641300      England Women's
+## 14      2     82     18        168 0.731500      England Women's
+## 15      2     85     45        178 0.119000      England Women's
+## 16      2     91     59        192 1.481900      England Women's
+## 17      1     12     22         28 0.841519      England Women's
+## 18      1     15     53         33 1.361310      England Women's
+## 19      1     23     46         46 0.083800      England Women's
+## 20      1     27     45         52 0.502000      England Women's
+## 21      1     27     47         52 0.376480      England Women's
+## 22      1     37     12         68 1.011481      England Women's
+## 23      1     39     27         71 0.612033      England Women's
+## 24      1     40     17         73 0.417000      England Women's
+## 25      1     40     21         73 0.134400      England Women's
+## 26      1     45     53         80 0.184100      England Women's
+## 27      2     50      9         94 0.075300      England Women's
+## 28      2     50     11         94 0.459900      England Women's
+## 29      2     55     51        105 0.558751      England Women's
+## 30      2     60     40        118 0.375597      England Women's
+## 31      2     64     42        125 0.934684      England Women's
+## 32      2     71     16        134 0.837540      England Women's
+## 33      2     85      0        166 1.176300      England Women's
+## 34      1     12      6         22 0.073400      England Women's
+## 35      1     12     56         23 0.733774      England Women's
+## 36      1     13     18         24 1.369300      England Women's
+## 37      1     13     55         26 2.542000      England Women's
+## 38      1     17     29         32 1.066800      England Women's
+## 39      1     18      5         33 0.918400      England Women's
+## 40      1     18     43         34 0.426400      England Women's
+## 41      1     23     43         42 2.038411      England Women's
+## 42      1     33     22         67 0.444500      England Women's
+## 43      1     34      5         68 0.860600      England Women's
+## 44      2     48      6         97 0.321800      England Women's
+## 45      2     48      8         97 0.371900      England Women's
+## 46      2     58     25        116 0.907500      England Women's
+## 47      2     60     27        119 0.576500      England Women's
+## 48      2     63     47        127 1.343900      England Women's
+## 49      2     72     29        148 1.056434      England Women's
+## 50      2     83     33        173 1.067200      England Women's
+## 51      1     13     58         26 0.665400      England Women's
+## 52      1     20     19         40 1.579100      England Women's
+## 53      1     48      3         88 1.394700      England Women's
+## 54      2     57     30        107 0.906300      England Women's
+## 55      2     61      5        113 0.853400      England Women's
+## 56      2     75     18        144 1.039500      England Women's
+## 57      2     81     45        153 0.136500      England Women's
+## 58      1      2      6          5 1.232300      England Women's
+## 59      1     20      9         37 0.769789      England Women's
+## 60      1     28     31         55 0.716600      England Women's
+## 61      1     28     44         55 0.245800      England Women's
+## 62      1     38      2         69 0.475000      England Women's
+## 63      1     39     50         73 0.469220      England Women's
+## 64      1     45      3         78 0.390327      England Women's
+## 65      2     51      4         94 1.381000      England Women's
+## 66      2     56     37        109 0.754021      England Women's
+## 67      2     59     10        113 0.360000      England Women's
+## 68      2     59     40        114 0.554583      England Women's
+## 69      2     64     13        122 0.147300      England Women's
+## 70      2     68     35        134 1.053517      England Women's
+## 71      2     82     57        157 0.250057      England Women's
+## 72      2     90      6        171 0.923531      England Women's
+## 73      2     91      5        174 0.120300      England Women's
+## 74      1     18     40         37 0.583837      England Women's
+## 75      1     32     23         62 1.476177      England Women's
+## 76      1     44     52         89 2.235213      England Women's
+## 77      2     49      4         96 0.850709      England Women's
+## 78      2     83     10        156 0.527100      England Women's
+## 79      2     85     18        161 0.043700      England Women's
+## 80      2     95     45        177 1.916327      England Women's
+## 81      1     22     46         37 1.118733      England Women's
+## 82      1     30     38         52 1.359400      England Women's
+## 83      1     50     54         88 0.454200      England Women's
+## 84      2     49     49        102 0.515500      England Women's
+## 85      2     49     55        102 1.399900      England Women's
+## 86      2     56     48        117 0.222300      England Women's
+## 87      2     61     32        126 1.311600      England Women's
+## 88      2     89      2        189 0.502900      England Women's
+## 89      2     90     17        191 1.339000      England Women's
+## 90      2     90     56        193 0.382200      England Women's
+##    play_pattern.id play_pattern.name player.id         player.name
+## 1                2       From Corner     10180         Ellen White
+## 2                5             Other      4654       Nikita Parris
+## 3                4     From Throw In      4641     Francesca Kirby
+## 4                3    From Free Kick     10180         Ellen White
+## 5                1      Regular Play     15619        Bethany Mead
+## 6                1      Regular Play     10180         Ellen White
+## 7                1      Regular Play     10180         Ellen White
+## 8                4     From Throw In      4660       Erin Cuthbert
+## 9                2       From Corner     10185  Stephanie Houghton
+## 10               2       From Corner      4658         Keira Walsh
+## 11               1      Regular Play      4654       Nikita Parris
+## 12               1      Regular Play     10180         Ellen White
+## 13               2       From Corner     10180         Ellen White
+## 14               1      Regular Play     10252      Alex Greenwood
+## 15               1      Regular Play     15553  Karen Julia Carney
+## 16               1      Regular Play      4643     Georgia Stanway
+## 17               1      Regular Play     10172          Jill Scott
+## 18               3    From Free Kick     10185  Stephanie Houghton
+## 19               2       From Corner     10190          Jade Moore
+## 20               5             Other      4654       Nikita Parris
+## 21               5             Other      5002        Jodie Taylor
+## 22               4     From Throw In     10172          Jill Scott
+## 23               3    From Free Kick     10172          Jill Scott
+## 24               6      From Counter     15619        Bethany Mead
+## 25               6      From Counter      4654       Nikita Parris
+## 26               2       From Corner      5002        Jodie Taylor
+## 27               3    From Free Kick     10190          Jade Moore
+## 28               3    From Free Kick      4654       Nikita Parris
+## 29               1      Regular Play      5002        Jodie Taylor
+## 30               1      Regular Play      5002        Jodie Taylor
+## 31               2       From Corner     10172          Jill Scott
+## 32               4     From Throw In     10172          Jill Scott
+## 33               1      Regular Play      4654       Nikita Parris
+## 34               1      Regular Play      4643     Georgia Stanway
+## 35               2       From Corner     10172          Jill Scott
+## 36               2       From Corner      4643     Georgia Stanway
+## 37               6      From Counter     10180         Ellen White
+## 38               4     From Throw In     10172          Jill Scott
+## 39               2       From Corner      4643     Georgia Stanway
+## 40               2       From Corner     10180         Ellen White
+## 41               1      Regular Play     10180         Ellen White
+## 42               1      Regular Play      5058         Rachel Daly
+## 43               2       From Corner     10183         Toni Duggan
+## 44               4     From Throw In     10172          Jill Scott
+## 45               4     From Throw In      4643     Georgia Stanway
+## 46               1      Regular Play     10183         Toni Duggan
+## 47               4     From Throw In      4658         Keira Walsh
+## 48               4     From Throw In      4643     Georgia Stanway
+## 49               1      Regular Play     25637      Yuika Sugasawa
+## 50               7    From Goal Kick     10180         Ellen White
+## 51               3    From Free Kick     10185  Stephanie Houghton
+## 52               4     From Throw In     10183         Toni Duggan
+## 53               1      Regular Play     10180         Ellen White
+## 54               2       From Corner     10252      Alex Greenwood
+## 55               1      Regular Play     10180         Ellen White
+## 56               4     From Throw In      5002        Jodie Taylor
+## 57               3    From Free Kick      5002        Jodie Taylor
+## 58               1      Regular Play     10172          Jill Scott
+## 59               4     From Throw In      4654       Nikita Parris
+## 60               4     From Throw In     10180         Ellen White
+## 61               4     From Throw In      4641     Francesca Kirby
+## 62               1      Regular Play      4654       Nikita Parris
+## 63               1      Regular Play     10180         Ellen White
+## 64               1      Regular Play     10172          Jill Scott
+## 65               3    From Free Kick     10178         Lucy Bronze
+## 66               3    From Free Kick     10178         Lucy Bronze
+## 67               1      Regular Play     10172          Jill Scott
+## 68               2       From Corner      4654       Nikita Parris
+## 69               1      Regular Play     10180         Ellen White
+## 70               1      Regular Play     15619        Bethany Mead
+## 71               5             Other      4654       Nikita Parris
+## 72               1      Regular Play      4643     Georgia Stanway
+## 73               1      Regular Play      4643     Georgia Stanway
+## 74               1      Regular Play     10180         Ellen White
+## 75               4     From Throw In      4658         Keira Walsh
+## 76               2       From Corner     10172          Jill Scott
+## 77               3    From Free Kick     10180         Ellen White
+## 78               5             Other     10185  Stephanie Houghton
+## 79               4     From Throw In      4641     Francesca Kirby
+## 80               4     From Throw In     10190          Jade Moore
+## 81               4     From Throw In     10178         Lucy Bronze
+## 82               6      From Counter      4641     Francesca Kirby
+## 83               1      Regular Play     10180         Ellen White
+## 84               4     From Throw In     10252      Alex Greenwood
+## 85               4     From Throw In     10190          Jade Moore
+## 86               1      Regular Play     10172          Jill Scott
+## 87               2       From Corner     10185  Stephanie Houghton
+## 88               2       From Corner     10178         Lucy Bronze
+## 89               1      Regular Play     15553  Karen Julia Carney
+## 90               8       From Keeper     26094 Julia Zigiotti-Olme
+##                position.name shot.statsbomb_xg shot.first_time
+## 1             Center Forward       0.068904970              NA
+## 2             Right Midfield       0.760000000              NA
+## 3       Left Center Midfield       0.038071502              NA
+## 4             Center Forward       0.108752210            TRUE
+## 5              Left Midfield       0.149659050            TRUE
+## 6             Center Forward       0.112854230            TRUE
+## 7             Center Forward       0.241823960            TRUE
+## 8             Center Forward       0.037933180            TRUE
+## 9          Right Center Back       0.028225591              NA
+## 10 Center Defensive Midfield       0.010969785              NA
+## 11            Right Midfield       0.015790934              NA
+## 12            Center Forward       0.064776940              NA
+## 13            Center Forward       0.306167630            TRUE
+## 14                 Left Back       0.010900204              NA
+## 15             Left Midfield       0.017147730              NA
+## 16      Left Center Midfield       0.011637270            TRUE
+## 17     Right Center Midfield       0.025989253              NA
+## 18         Right Center Back       0.023204813              NA
+## 19 Center Defensive Midfield       0.026064698            TRUE
+## 20            Right Midfield       0.760000000              NA
+## 21            Center Forward       0.252417330            TRUE
+## 22     Right Center Midfield       0.026543833            TRUE
+## 23     Right Center Midfield       0.074873604            TRUE
+## 24             Left Midfield       0.156262730              NA
+## 25            Right Midfield       0.044481170            TRUE
+## 26            Center Forward       0.122954890            TRUE
+## 27 Center Defensive Midfield       0.056136366              NA
+## 28            Right Midfield       0.038533002            TRUE
+## 29            Center Forward       0.179538370              NA
+## 30            Center Forward       0.764521960            TRUE
+## 31     Right Center Midfield       0.043803364              NA
+## 32     Right Center Midfield       0.112121046              NA
+## 33             Left Midfield       0.041447340            TRUE
+## 34      Left Center Midfield       0.012811429              NA
+## 35     Right Center Midfield       0.007495671              NA
+## 36      Left Center Midfield       0.009343912              NA
+## 37            Center Forward       0.196946870            TRUE
+## 38     Right Center Midfield       0.016026426              NA
+## 39      Left Center Midfield       0.016725910              NA
+## 40            Center Forward       0.027931545              NA
+## 41            Center Forward       0.035738077              NA
+## 42            Right Midfield       0.316895750              NA
+## 43             Left Midfield       0.032275260            TRUE
+## 44     Right Center Midfield       0.034384140            TRUE
+## 45      Left Center Midfield       0.038436290            TRUE
+## 46             Left Midfield       0.166239100            TRUE
+## 47 Center Defensive Midfield       0.024575464            TRUE
+## 48      Left Center Midfield       0.007676300              NA
+## 49      Right Center Forward       0.012526729              NA
+## 50            Center Forward       0.165428830            TRUE
+## 51         Right Center Back       0.030900702            TRUE
+## 52             Left Midfield       0.048546790              NA
+## 53            Center Forward       0.400640070              NA
+## 54                 Left Back       0.065117270            TRUE
+## 55            Center Forward       0.206704020            TRUE
+## 56            Center Forward       0.206666720            TRUE
+## 57            Center Forward       0.122250550            TRUE
+## 58     Right Center Midfield       0.342501000            TRUE
+## 59            Right Midfield       0.172962130              NA
+## 60            Center Forward       0.192790690            TRUE
+## 61      Left Center Midfield       0.017080681              NA
+## 62            Right Midfield       0.095194760              NA
+## 63            Center Forward       0.653364900            TRUE
+## 64     Right Center Midfield       0.267252860            TRUE
+## 65                Right Back       0.008538596              NA
+## 66                Right Back       0.051347204            TRUE
+## 67     Right Center Midfield       0.013573337              NA
+## 68            Right Midfield       0.016776394              NA
+## 69            Center Forward       0.054220613              NA
+## 70             Left Midfield       0.019010560              NA
+## 71            Right Midfield       0.760000000              NA
+## 72      Left Center Midfield       0.031440540              NA
+## 73      Left Center Midfield       0.092198570              NA
+## 74            Center Forward       0.224485920              NA
+## 75   Left Defensive Midfield       0.009345479              NA
+## 76  Right Defensive Midfield       0.033336457              NA
+## 77            Center Forward       0.212155280              NA
+## 78         Right Center Back       0.760000000              NA
+## 79                Right Wing       0.025896410              NA
+## 80   Left Defensive Midfield       0.005450467              NA
+## 81                Right Back       0.014201722              NA
+## 82      Left Center Midfield       0.093903000              NA
+## 83            Center Forward       0.320813980            TRUE
+## 84                 Left Back       0.004753734              NA
+## 85 Center Defensive Midfield       0.006697183            TRUE
+## 86     Right Center Midfield       0.015979930            TRUE
+## 87         Right Center Back       0.066199810              NA
+## 88                Right Back       0.055961013            TRUE
+## 89            Right Midfield       0.005038377              NA
+## 90     Right Center Midfield       0.125253290              NA
+##    shot.technique.name shot.outcome.name shot.type.name
+## 1               Normal           Wayward      Open Play
+## 2               Normal              Goal        Penalty
+## 3               Normal             Off T      Open Play
+## 4               Volley             Saved      Open Play
+## 5               Normal             Saved      Open Play
+## 6               Normal             Saved      Open Play
+## 7               Normal              Goal      Open Play
+## 8               Normal             Off T      Open Play
+## 9               Normal             Off T      Open Play
+## 10              Normal             Off T      Open Play
+## 11              Normal             Off T      Open Play
+## 12              Normal             Off T      Open Play
+## 13              Volley             Saved      Open Play
+## 14              Normal           Blocked      Open Play
+## 15              Normal           Blocked      Open Play
+## 16              Normal             Off T      Open Play
+## 17              Normal             Saved      Open Play
+## 18              Normal             Off T      Free Kick
+## 19              Normal           Blocked      Open Play
+## 20              Normal     Saved to Post        Penalty
+## 21              Normal             Off T      Open Play
+## 22              Normal             Off T      Open Play
+## 23              Volley           Wayward      Open Play
+## 24              Normal             Saved      Open Play
+## 25              Normal           Blocked      Open Play
+## 26              Volley           Blocked      Open Play
+## 27              Normal           Blocked      Open Play
+## 28         Half Volley             Saved      Open Play
+## 29              Normal             Saved      Open Play
+## 30              Normal              Goal      Open Play
+## 31              Normal             Off T      Open Play
+## 32              Normal             Off T      Open Play
+## 33         Half Volley           Wayward      Open Play
+## 34              Normal           Blocked      Open Play
+## 35              Normal           Wayward      Open Play
+## 36              Normal             Off T      Open Play
+## 37              Normal              Goal      Open Play
+## 38              Normal             Saved      Open Play
+## 39              Normal             Saved      Open Play
+## 40              Normal           Wayward      Open Play
+## 41              Normal             Off T      Open Play
+## 42              Normal             Saved      Open Play
+## 43              Normal             Off T      Open Play
+## 44              Normal           Blocked      Open Play
+## 45         Half Volley           Blocked      Open Play
+## 46              Volley             Saved      Open Play
+## 47              Normal           Blocked      Open Play
+## 48              Normal             Off T      Open Play
+## 49              Normal             Saved      Open Play
+## 50              Normal              Goal      Open Play
+## 51              Normal              Goal      Open Play
+## 52              Normal             Off T      Open Play
+## 53              Normal              Goal      Open Play
+## 54              Normal              Goal      Open Play
+## 55                 Lob             Off T      Open Play
+## 56              Normal             Off T      Open Play
+## 57                 Lob           Blocked      Open Play
+## 58              Normal              Goal      Open Play
+## 59              Normal             Off T      Open Play
+## 60         Half Volley              Post      Open Play
+## 61              Normal           Blocked      Open Play
+## 62              Normal             Saved      Open Play
+## 63              Normal              Goal      Open Play
+## 64              Volley             Off T      Open Play
+## 65              Normal             Saved      Open Play
+## 66              Normal              Goal      Open Play
+## 67              Normal           Blocked      Open Play
+## 68              Normal             Off T      Open Play
+## 69              Normal           Blocked      Open Play
+## 70              Normal             Off T      Open Play
+## 71              Normal             Saved        Penalty
+## 72              Normal             Off T      Open Play
+## 73              Normal           Blocked      Open Play
+## 74         Half Volley              Goal      Open Play
+## 75              Normal             Saved      Open Play
+## 76              Normal             Off T      Open Play
+## 77       Overhead Kick             Saved      Open Play
+## 78              Normal             Saved        Penalty
+## 79              Normal           Blocked      Open Play
+## 80              Normal             Off T      Open Play
+## 81         Half Volley             Saved      Open Play
+## 82              Normal              Goal      Open Play
+## 83              Normal             Saved      Open Play
+## 84              Normal           Blocked      Open Play
+## 85              Normal             Off T      Open Play
+## 86              Normal           Blocked      Open Play
+## 87              Normal             Off T      Open Play
+## 88              Volley           Blocked      Open Play
+## 89              Normal             Saved      Open Play
+## 90              Normal             Saved      Open Play
+##    shot.body_part.name match_id location.x location.y location.x.GK
+## 1                 Head    22936      115.9       45.3         118.9
+## 2           Right Foot    22936      108.0       39.9            NA
+## 3           Right Foot    22936      101.1       39.5         118.4
+## 4           Right Foot    22936      112.6       41.7         119.4
+## 5           Right Foot    22936      110.1       28.4         118.2
+## 6            Left Foot    22936      103.2       34.6         117.9
+## 7            Left Foot    22936      104.9       37.1         114.0
+## 8           Right Foot    22936      102.7       49.4         119.3
+## 9                 Head    22936      112.2       40.8         118.7
+## 10          Right Foot    22936       90.9       44.4         119.0
+## 11          Right Foot    22936       91.4       40.5         119.1
+## 12                Head    22936      114.6       47.1         119.3
+## 13          Right Foot    22936      114.1       38.7         119.3
+## 14           Left Foot    22936       92.2       19.7         119.1
+## 15          Right Foot    22936      103.6       56.4         118.8
+## 16          Right Foot    22936       89.6       42.3         118.6
+## 17                Head    22962      108.0       39.8         119.1
+## 18          Right Foot    22962       93.7       22.9         119.0
+## 19          Right Foot    22962       98.7       41.7         118.7
+## 20          Right Foot    22962      108.0       40.1            NA
+## 21          Right Foot    22962      113.7       47.0         118.9
+## 22          Right Foot    22962       93.8       42.3         115.8
+## 23          Right Foot    22962      112.8       40.7         119.1
+## 24           Left Foot    22962      105.1       33.0         115.2
+## 25          Right Foot    22962      109.7       53.6         119.2
+## 26          Right Foot    22962      114.7       44.0         118.6
+## 27                Head    22962      114.8       45.5         118.5
+## 28           Left Foot    22962      106.2       40.1         119.3
+## 29                Head    22962      113.5       40.3         118.8
+## 30          Right Foot    22962      115.5       40.6         116.4
+## 31                Head    22962      111.6       41.6         119.3
+## 32                Head    22962      113.3       45.3         119.0
+## 33          Right Foot    22962      105.0       34.0         118.6
+## 34          Right Foot    68337       94.4       50.0         118.5
+## 35                Head    68337      107.3       41.1         119.4
+## 36          Right Foot    68337       93.6       34.9         119.0
+## 37           Left Foot    68337      109.9       27.8         111.6
+## 38          Right Foot    68337       90.5       43.6         118.8
+## 39          Right Foot    68337       96.7       35.9         119.4
+## 40                Head    68337      113.2       45.7         119.6
+## 41                Head    68337      109.8       46.9         118.8
+## 42          Right Foot    68337      105.2       43.9         114.9
+## 43          Right Foot    68337      103.2       42.1         118.7
+## 44          Right Foot    68337      104.8       51.6         118.7
+## 45          Right Foot    68337      103.8       43.9         118.9
+## 46          Right Foot    68337      112.0       38.2         119.0
+## 47          Right Foot    68337       94.1       46.8         119.1
+## 48          Right Foot    68337       92.5       27.9         119.1
+## 49          Right Foot    68337       92.5       32.9         118.5
+## 50           Left Foot    68337      103.3       30.7         113.5
+## 51          Right Foot    68362      113.9       36.1         118.5
+## 52          Right Foot    68362      102.8       27.8         118.3
+## 53           Left Foot    68362      104.5       39.3         112.6
+## 54           Left Foot    68362      108.8       37.8         119.1
+## 55           Left Foot    68362      108.2       33.6         111.3
+## 56          Right Foot    68362      105.7       32.6         115.6
+## 57          Right Foot    68362      102.9       29.1         104.6
+## 58          Right Foot    69199      109.1       42.8         118.9
+## 59           Left Foot    69199      112.9       51.2         119.1
+## 60          Right Foot    69199      112.6       51.4         119.0
+## 61           Left Foot    69199      104.4       22.1         118.4
+## 62                Head    69199      115.0       49.9         119.8
+## 63          Right Foot    69199      114.9       42.0         116.2
+## 64          Right Foot    69199      118.0       45.8         119.4
+## 65          Right Foot    69199       94.7       51.6         118.1
+## 66          Right Foot    69199      100.1       45.4         118.5
+## 67          Right Foot    69199      108.5       58.8         118.2
+## 68          Right Foot    69199      117.3       54.9         119.1
+## 69          Right Foot    69199      102.4       45.4         114.9
+## 70          Right Foot    69199      103.7       22.9         119.0
+## 71          Right Foot    69199      108.0       39.9            NA
+## 72          Right Foot    69199      107.1       54.7         117.2
+## 73          Right Foot    69199      102.9       44.5         116.5
+## 74          Right Foot    69258      113.4       37.9         119.3
+## 75          Right Foot    69258       92.3       26.7         119.0
+## 76                Head    69258      111.6       39.9         118.7
+## 77          Right Foot    69258      118.0       36.5         119.4
+## 78          Right Foot    69258      108.1       40.1            NA
+## 79          Right Foot    69258      105.6       46.3         119.5
+## 80          Right Foot    69258       78.1       52.2         118.1
+## 81          Right Foot    69301       93.7       51.1         118.7
+## 82           Left Foot    69301      108.0       52.7         118.0
+## 83          Right Foot    69301      108.4       53.3         113.9
+## 84           Left Foot    69301       84.3       31.3         118.7
+## 85          Right Foot    69301       81.9       35.2         118.7
+## 86          Right Foot    69301       88.6       39.9         118.9
+## 87                Head    69301      117.5       48.2         119.5
+## 88          Right Foot    69301      107.0       37.7         113.5
+## 89          Right Foot    69301       89.3       33.5         118.7
+## 90           Left Foot    69301      109.0       33.4         116.3
+##    location.y.GK         player.name.GK DistToGoal DistToKeeper
+## 1           41.5          Lee Alexander   6.700746    1.8601075
+## 2             NA                   <NA>  12.000417           NA
+## 3           40.2          Lee Alexander  18.906613    1.6124515
+## 4           41.9          Lee Alexander   7.592760    1.9924859
+## 5           38.0          Lee Alexander  15.250246    2.6907248
+## 6           38.6          Lee Alexander  17.646529    2.5238859
+## 7           38.3          Lee Alexander  15.375955    6.2361847
+## 8           41.5         Karen Bardsley  19.688829    1.6552945
+## 9           40.1          Lee Alexander   7.840918    1.3038405
+## 10          40.5          Lee Alexander  29.430766    1.1180340
+## 11          39.8          Lee Alexander  28.604370    0.9219544
+## 12          42.9          Lee Alexander   8.920202    2.9832868
+## 13          41.3          Lee Alexander   6.041523    1.4764823
+## 14          38.7          Lee Alexander  34.422812    1.5811388
+## 15          42.5          Lee Alexander  23.193102    2.7730849
+## 16          40.0          Lee Alexander  30.486882    1.4000000
+## 17          41.0    Vanina Noemí Correa  12.001667    1.3453624
+## 18          38.9    Vanina Noemí Correa  31.370368    1.4866069
+## 19          40.4    Vanina Noemí Correa  21.367733    1.3601471
+## 20            NA                   <NA>  12.000417           NA
+## 21          42.7    Vanina Noemí Correa   9.417537    2.9154759
+## 22          38.9    Vanina Noemí Correa  26.300760    4.3416587
+## 23          39.9    Vanina Noemí Correa   7.233948    0.9055385
+## 24          39.7    Vanina Noemí Correa  16.462381    4.8093659
+## 25          43.4    Vanina Noemí Correa  17.060188    3.4928498
+## 26          41.0    Vanina Noemí Correa   6.640030    1.7204651
+## 27          43.1    Vanina Noemí Correa   7.569016    3.4438351
+## 28          40.6    Vanina Noemí Correa  13.800362    0.9219544
+## 29          41.2    Vanina Noemí Correa   6.506919    1.6970563
+## 30          38.0    Vanina Noemí Correa   4.539824    4.1182521
+## 31          41.4    Vanina Noemí Correa   8.551023    1.5652476
+## 32          41.8    Vanina Noemí Correa   8.542833    2.0591260
+## 33          41.1    Vanina Noemí Correa  16.155494    1.7804494
+## 34          42.6        Ayaka Yamashita  27.483813    3.0016662
+## 35          40.3        Ayaka Yamashita  12.747549    0.6708204
+## 36          41.5        Ayaka Yamashita  26.888101    1.8027756
+## 37          29.3        Ayaka Yamashita  15.838245   13.6033084
+## 38          41.5        Ayaka Yamashita  29.718849    1.9209373
+## 39          39.4        Ayaka Yamashita  23.657980    0.8485281
+## 40          40.9        Ayaka Yamashita   8.872993    0.9848858
+## 41          43.0        Ayaka Yamashita  12.314625    3.2310989
+## 42          41.4        Ayaka Yamashita  15.305228    5.2886671
+## 43          41.5        Ayaka Yamashita  16.930741    1.9849433
+## 44          41.9        Ayaka Yamashita  19.120669    2.3021729
+## 45          40.6        Ayaka Yamashita  16.662833    1.2529964
+## 46          40.8        Ayaka Yamashita   8.200000    1.2806248
+## 47          39.6        Ayaka Yamashita  26.777789    0.9848858
+## 48          37.6        Ayaka Yamashita  30.044301    2.5632011
+## 49          39.9         Karen Bardsley  28.401761    1.5033296
+## 50          34.5        Ayaka Yamashita  19.114916    8.5146932
+## 51          40.0            Annette Ngo   7.240166    1.5000000
+## 52          37.1            Annette Ngo  21.087437    3.3615473
+## 53          39.4            Annette Ngo  15.515798    7.4242845
+## 54          39.9            Annette Ngo  11.414026    0.9055385
+## 55          34.9            Annette Ngo  13.423859   10.0846418
+## 56          39.3            Annette Ngo  16.101242    4.4553339
+## 57          29.9            Annette Ngo  20.278560   18.4165686
+## 58          42.9       Ingrid Hjelmseth  11.253888    3.1016125
+## 59          43.2       Ingrid Hjelmseth  13.260845    3.3241540
+## 60          43.3       Ingrid Hjelmseth  13.591174    3.4481879
+## 61          37.7       Ingrid Hjelmseth  23.743841    2.8017851
+## 62          43.1       Ingrid Hjelmseth  11.090987    3.1064449
+## 63          43.4       Ingrid Hjelmseth   5.478138    5.0990195
+## 64          41.2       Ingrid Hjelmseth   6.135145    1.3416408
+## 65          40.2       Ingrid Hjelmseth  27.832535    1.9104973
+## 66          41.0       Ingrid Hjelmseth  20.619651    1.8027756
+## 67          43.2       Ingrid Hjelmseth  22.038376    3.6715120
+## 68          43.2       Ingrid Hjelmseth  15.142655    3.3241540
+## 69          40.4       Ingrid Hjelmseth  18.409780    5.1156622
+## 70          37.7       Ingrid Hjelmseth  23.624140    2.5079872
+## 71            NA                   <NA>  12.000417           NA
+## 72          42.7       Ingrid Hjelmseth  19.557607    3.8897301
+## 73          40.9       Ingrid Hjelmseth  17.682194    3.6138622
+## 74          38.5          Alyssa Naeher   6.926038    1.6552945
+## 75          38.6          Alyssa Naeher  30.727512    1.7204651
+## 76          41.3          Alyssa Naeher   8.400595    1.8384776
+## 77          37.3          Alyssa Naeher   4.031129    2.7658633
+## 78            NA                   <NA>  11.900420           NA
+## 79          42.8          Alyssa Naeher  15.717824    2.8442925
+## 80          41.4          Alyssa Naeher  43.640005    2.3600847
+## 81          41.0     Rut Hedvig Lindahl  28.546453    1.6401219
+## 82          42.6     Rut Hedvig Lindahl  17.472550    3.2802439
+## 83          46.8     Rut Hedvig Lindahl  17.647946    9.1350972
+## 84          39.2     Rut Hedvig Lindahl  36.744796    1.5264338
+## 85          39.8     Rut Hedvig Lindahl  38.401172    1.3152946
+## 86          40.4     Rut Hedvig Lindahl  31.400159    1.1704700
+## 87          42.7     Rut Hedvig Lindahl   8.572631    2.7459060
+## 88          36.4     Rut Hedvig Lindahl  13.201894    7.4303432
+## 89          38.5     Rut Hedvig Lindahl  31.380567    1.9849433
+## 90          37.1 Carly Mitchell Telford  12.828094    4.7010637
+##    AngleToGoal avevelocity distance.ToD1 DefendersBehindBall TimeInPoss
+## 1    142.27500   40.712719     0.7000000                   3      1.138
+## 2     89.52255   19.755872    30.0000000                   0      0.000
+## 3     88.48459   23.871831     3.8418745                   8      9.375
+## 4    102.93806   14.477794     0.9848858                   3    102.659
+## 5     40.47904   26.086521     3.5014283                   2     21.737
+## 6     72.18111   17.887292     1.6278821                   2      2.178
+## 7     79.12855   15.647206     2.6076810                   3     44.904
+## 8    118.51756   14.338036     6.0802960                   3     14.778
+## 9     95.85601    4.486696     1.3601471                   8      2.166
+## 10    98.59815   24.230628     4.3289722                  10      7.292
+## 11    91.00157   24.288153     5.6364883                   6      5.598
+## 12   142.74471    9.780386     2.4186773                   1     25.152
+## 13    77.57406    7.741894     1.2041595                   4      2.954
+## 14    53.86249   29.774486     7.0092796                   8     11.887
+## 15   135.00000   41.210756     4.9396356                   4      9.883
+## 16    94.32664   21.212641     2.9732137                   8      9.976
+## 17    89.04516   12.621468     0.7810250                   3     28.826
+## 18    56.96848   21.920978    12.1247680                  10      0.000
+## 19    94.56323   17.939494     2.9017236                   8      6.310
+## 20    90.47745   23.218924    30.0000000                   0      0.000
+## 21   138.01279   16.786576    -1.1000000                   0      2.180
+## 22    95.01692   26.595402     6.0141500                   8    121.470
+## 23    95.55297    7.621748     0.5000000                   7      1.498
+## 24    64.83593   28.333919     1.6763055                   1      2.923
+## 25   142.86143   13.247391     2.2803509                   4      6.662
+## 26   127.04247    9.250074     1.5620499                   4      1.242
+## 27   136.60600   17.817275     1.1661904                   5      1.813
+## 28    90.41518   27.853364     2.1931712                  10      3.386
+## 29    92.64255    8.948530    -1.2649111                   0     33.745
+## 30    97.59464   12.168782    -2.5806976                   0     17.511
+## 31   100.78430    9.093983     0.9486833                   6      1.518
+## 32   128.34557   12.754849     1.0049876                   2     31.265
+## 33    68.19859   10.653710     2.8178006                   6     68.695
+## 34   111.33686   26.206245     2.5632011                   7      8.882
+## 35    94.95027   14.283601     0.7071068                  10      2.116
+## 36    79.06618   22.852678     2.7313001                   8      6.858
+## 37    39.62030    7.048729    -5.6222771                   0      7.100
+## 38    96.95763   26.537207     6.4660653                   7     45.091
+## 39    80.02008   25.096756     3.5468296                  10      3.284
+## 40   129.97093   15.229464     0.6403124                   6      1.550
+## 41   124.07720   11.364909     2.1633308                   2     49.107
+## 42   104.76262   21.062222    -0.7071068                   0     19.198
+## 43    97.12502   21.877649     1.4866069                  10      4.816
+## 44   127.34935   13.213357     2.1023796                   8     28.007
+## 45   103.53586   19.651021     2.2203603                   8     29.980
+## 46    77.31962    9.110756     1.8027756                   2     23.932
+## 47   104.71089   23.257947     7.6026311                   8     24.793
+## 48    66.25051   20.759540     6.4474801                   8      6.575
+## 49    75.52340   25.233966     3.0675723                   5      7.105
+## 50    60.88717   16.627755     1.1401754                   1     26.708
+## 51    57.40742   14.528812     5.4918121                  10      0.744
+## 52    54.65183   15.181766     3.4481879                   3     15.051
+## 53    87.41421   11.172555    11.7153745                   1     35.198
+## 54    78.88696   13.122426     2.3537205                   7      1.541
+## 55    61.52580   18.903159     4.2755117                   1     28.614
+## 56    62.63923   21.666389     8.2764727                   3     15.480
+## 57    57.48547  131.051603     1.5033296                   1    117.016
+## 58   104.40669   10.257255     5.8600341                   5     42.815
+## 59   147.62822   22.620761     4.8764741                   3     14.361
+## 60   147.01148   23.716980     9.4005319                   2      5.376
+## 61    41.07242   16.460479     5.2153619                   6     17.924
+## 62   153.20392   16.058066    -1.7262677                   0     33.926
+## 63   111.41297   11.526207     6.5007692                   1     24.205
+## 64   160.97439    5.428684     3.6221541                   3     20.978
+## 65   114.63136   18.075577     1.4317821                  10      3.289
+## 66   105.18201   27.180131     4.4654227                  10      1.759
+## 67   148.54579   13.405476     5.9640590                   4     27.438
+## 68   169.72900   19.374496    -0.9486833                   0      2.978
+## 69   107.05697   13.846625     2.6019224                   4      7.954
+## 70    43.62791   23.191036     1.8248288                   4     19.213
+## 71    89.52255   47.629460    30.0000000                   0      0.000
+## 72   138.73140   26.318294     3.1780497                   4     46.207
+## 73   104.74356   35.394296     5.2630789                   4      8.076
+## 74    72.34988   15.162936    -1.6124515                   0     25.490
+## 75    64.35227   21.435889     5.8420887                   7      4.823
+## 76    89.31794    7.887304     1.4317821                   7      1.617
+## 77    29.74488    2.610012     2.7658633                   4      3.565
+## 78    90.48147   22.500506    30.0000000                   0      0.000
+## 79   113.62938   30.098276     2.0099751                   7     35.249
+## 80   106.23395   21.868729    11.4236597                   8     20.657
+## 81   112.88233   23.340920     6.9892775                   9     10.388
+## 82   136.62333   15.067797     1.5524175                   2     14.359
+## 83   138.90570   18.579044    -5.5072679                   0     14.175
+## 84    76.30412   36.972102     1.4317821                   7     11.187
+## 85    82.81946   27.225603     4.9396356                   9     17.175
+## 86    89.81753   32.989136     7.0349129                   4     50.094
+## 87   163.04469    3.156487     1.3000000                   2      1.424
+## 88    79.96688   24.951892     3.9560081                   8      3.130
+## 89    78.04552   21.599287     1.0000000                   8     18.965
+## 90    59.03624   18.607959     3.1890437                   1     21.856
+##    is_goal
+## 1    FALSE
+## 2     TRUE
+## 3    FALSE
+## 4    FALSE
+## 5    FALSE
+## 6    FALSE
+## 7     TRUE
+## 8    FALSE
+## 9    FALSE
+## 10   FALSE
+## 11   FALSE
+## 12   FALSE
+## 13   FALSE
+## 14   FALSE
+## 15   FALSE
+## 16   FALSE
+## 17   FALSE
+## 18   FALSE
+## 19   FALSE
+## 20   FALSE
+## 21   FALSE
+## 22   FALSE
+## 23   FALSE
+## 24   FALSE
+## 25   FALSE
+## 26   FALSE
+## 27   FALSE
+## 28   FALSE
+## 29   FALSE
+## 30    TRUE
+## 31   FALSE
+## 32   FALSE
+## 33   FALSE
+## 34   FALSE
+## 35   FALSE
+## 36   FALSE
+## 37    TRUE
+## 38   FALSE
+## 39   FALSE
+## 40   FALSE
+## 41   FALSE
+## 42   FALSE
+## 43   FALSE
+## 44   FALSE
+## 45   FALSE
+## 46   FALSE
+## 47   FALSE
+## 48   FALSE
+## 49   FALSE
+## 50    TRUE
+## 51    TRUE
+## 52   FALSE
+## 53    TRUE
+## 54    TRUE
+## 55   FALSE
+## 56   FALSE
+## 57   FALSE
+## 58    TRUE
+## 59   FALSE
+## 60   FALSE
+## 61   FALSE
+## 62   FALSE
+## 63    TRUE
+## 64   FALSE
+## 65   FALSE
+## 66    TRUE
+## 67   FALSE
+## 68   FALSE
+## 69   FALSE
+## 70   FALSE
+## 71   FALSE
+## 72   FALSE
+## 73   FALSE
+## 74    TRUE
+## 75   FALSE
+## 76   FALSE
+## 77   FALSE
+## 78   FALSE
+## 79   FALSE
+## 80   FALSE
+## 81   FALSE
+## 82    TRUE
+## 83   FALSE
+## 84   FALSE
+## 85   FALSE
+## 86   FALSE
+## 87   FALSE
+## 88   FALSE
+## 89   FALSE
+## 90   FALSE
+\end{verbatim}
+
+\emph{Looking at the data set, it appears that Ellen White overperformed
+the most on the England Women's team, as she scored 2.405 greater than
+expected.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Make a shot map for all shots from England's Ellen White
+  (\texttt{player.name}), using a different symbol for whether or not
+  each shot resulted in a goal.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ellen_white_shot_map <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(player.name }\OperatorTok{==}\StringTok{ "Ellen White"}\NormalTok{)}
+
+\NormalTok{t1 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ellen_white_shot_map, }\KeywordTok{aes}\NormalTok{(location.x, location.y, }
+      \DataTypeTok{shape =}\NormalTok{ is_goal, }\DataTypeTok{color =}\NormalTok{ is_goal)) }\OperatorTok{+}\StringTok{ }
+\StringTok{      }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{t1}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Exam2_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+\emph{Above is the shot map for Ellen White, differentiated by which
+shots resulted in goals and which shots did not.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  A coach wants an analyst to measure the likelihood of a goal.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(splines)}
+\NormalTok{wwc_shot <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{is_goal =}\NormalTok{ shot.outcome.name }\OperatorTok{==}\StringTok{ "Goal"}\NormalTok{)}
+
+\NormalTok{fit1 <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(is_goal }\OperatorTok{~}\StringTok{ }\NormalTok{avevelocity }\OperatorTok{+}\StringTok{ }\NormalTok{minute, }\DataTypeTok{data =}\NormalTok{ wwc_shot, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\NormalTok{fit2 <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(is_goal }\OperatorTok{~}\StringTok{ }\KeywordTok{ns}\NormalTok{(avevelocity, }\DecValTok{5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\NormalTok{minute, }\DataTypeTok{data =}\NormalTok{ wwc_shot, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\NormalTok{fit3 <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(is_goal }\OperatorTok{~}\StringTok{ }\NormalTok{avevelocity }\OperatorTok{+}\StringTok{ }\KeywordTok{ns}\NormalTok{(minute, }\DecValTok{5}\NormalTok{), }\DataTypeTok{data =}\NormalTok{ wwc_shot, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\NormalTok{fit4 <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(is_goal }\OperatorTok{~}\StringTok{ }\KeywordTok{ns}\NormalTok{(avevelocity, }\DecValTok{5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ns}\NormalTok{(minute, }\DecValTok{5}\NormalTok{), }\DataTypeTok{data =}\NormalTok{ wwc_shot, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Pick which of the models above makes the most sense to use to share with
+the coach.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{AIC}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 908.9424
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{AIC}\NormalTok{(fit2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 903.2183
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{AIC}\NormalTok{(fit3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 912.9059
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{AIC}\NormalTok{(fit4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 907.0282
+\end{verbatim}
+
+\emph{The coach should most like choose the second model, fit2. This is
+simply because when looking at the AIC values for each model, fit2 had
+the lowest of all four models.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  What is the association between average velocity \texttt{avevelocity}
+  and the likelihood of a goal? Several possible tools are usable here,
+  including a look at the models above.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = is_goal ~ avevelocity + minute, family = "binomial", 
+##     data = wwc_shot)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5283  -0.4917  -0.4775  -0.4601   2.3912  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept) -2.193336   0.204948 -10.702   <2e-16 ***
+## avevelocity -0.002242   0.004327  -0.518    0.604    
+## minute       0.002626   0.003166   0.829    0.407    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 904.18  on 1313  degrees of freedom
+## Residual deviance: 902.94  on 1311  degrees of freedom
+## AIC: 908.94
+## 
+## Number of Fisher Scoring iterations: 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = is_goal ~ ns(avevelocity, 5) + minute, family = "binomial", 
+##     data = wwc_shot)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6415  -0.5338  -0.4416  -0.3854   2.3502  
+## 
+## Coefficients:
+##                       Estimate Std. Error z value Pr(>|z|)  
+## (Intercept)          -1.898402   0.739106  -2.569   0.0102 *
+## ns(avevelocity, 5)1   0.363549   0.671064   0.542   0.5880  
+## ns(avevelocity, 5)2  -0.828138   0.758837  -1.091   0.2751  
+## ns(avevelocity, 5)3   4.333052   9.904734   0.437   0.6618  
+## ns(avevelocity, 5)4 -10.340908  72.534452  -0.143   0.8866  
+## ns(avevelocity, 5)5 -24.026911 153.861919  -0.156   0.8759  
+## minute                0.002746   0.003206   0.857   0.3916  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 904.18  on 1313  degrees of freedom
+## Residual deviance: 889.22  on 1307  degrees of freedom
+## AIC: 903.22
+## 
+## Number of Fisher Scoring iterations: 10
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = is_goal ~ avevelocity + ns(minute, 5), family = "binomial", 
+##     data = wwc_shot)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.8106  -0.4884  -0.4649  -0.4548   2.4444  
+## 
+## Coefficients:
+##                 Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)    -2.113520   0.440629  -4.797 1.61e-06 ***
+## avevelocity    -0.002279   0.004317  -0.528   0.5975    
+## ns(minute, 5)1 -0.145179   0.496985  -0.292   0.7702    
+## ns(minute, 5)2 -0.012127   0.595936  -0.020   0.9838    
+## ns(minute, 5)3 -0.176490   0.472825  -0.373   0.7090    
+## ns(minute, 5)4  0.889296   1.101292   0.808   0.4194    
+## ns(minute, 5)5  1.170555   0.625269   1.872   0.0612 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 904.18  on 1313  degrees of freedom
+## Residual deviance: 898.91  on 1307  degrees of freedom
+## AIC: 912.91
+## 
+## Number of Fisher Scoring iterations: 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = is_goal ~ ns(avevelocity, 5) + ns(minute, 5), family = "binomial", 
+##     data = wwc_shot)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9398  -0.5291  -0.4364  -0.3757   2.3551  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(>|z|)  
+## (Intercept)          -1.80465    0.83601  -2.159   0.0309 *
+## ns(avevelocity, 5)1   0.29724    0.67845   0.438   0.6613  
+## ns(avevelocity, 5)2  -0.89697    0.76721  -1.169   0.2423  
+## ns(avevelocity, 5)3   5.05708    9.98739   0.506   0.6126  
+## ns(avevelocity, 5)4 -16.56670   73.49596  -0.225   0.8217  
+## ns(avevelocity, 5)5 -37.04217  155.86164  -0.238   0.8121  
+## ns(minute, 5)1       -0.13779    0.50173  -0.275   0.7836  
+## ns(minute, 5)2        0.02824    0.59863   0.047   0.9624  
+## ns(minute, 5)3       -0.13456    0.47646  -0.282   0.7776  
+## ns(minute, 5)4        1.04613    1.10599   0.946   0.3442  
+## ns(minute, 5)5        1.14499    0.63269   1.810   0.0703 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 904.18  on 1313  degrees of freedom
+## Residual deviance: 885.03  on 1303  degrees of freedom
+## AIC: 907.03
+## 
+## Number of Fisher Scoring iterations: 9
+\end{verbatim}
+
+\emph{When looking at the summary statistics for each of the models
+above, there are no significant values for any of the average velocity
+variables, including when the models were spliced on average velocity.
+Therefore, from looking at this it would appear that there is no strong
+association between the average velocity and whether or not the shot is
+a goal. From an outside perspective, this might appear surprising,
+however when looking at the games and observing what shots go in, there
+are some valid explanations to the lack of fit. Alluding back to an
+article that was discussed earlier, the ability of a good player to
+score was less about the players ability to finish, and more so regarded
+a players ability to get into a finishing position. This sentiment
+agrees with the findings above, suggesting that success is less about
+how well the player kicks it, and moreso about how well a player
+positions themselves. Furthermore, when watching soccer a majority of
+goals are delivered from instances like tip ins and deflections, which
+have a slower velocity than a fast strike taken from further back.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Use the Hosmer-Lemeshow test to assess \texttt{fit2} above. Is there
+  any evidence of a lack of fit?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tab_check <-}\StringTok{ }\NormalTok{wwc_shot }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{shot_prob_cat =} \KeywordTok{cut}\NormalTok{(shot.statsbomb_xg, }\DecValTok{10}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(shot_prob_cat) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{ave_exp_goals =} \KeywordTok{sum}\NormalTok{(shot.statsbomb_xg),}
+            \DataTypeTok{ave_act_goals =} \KeywordTok{sum}\NormalTok{(shot.outcome.name }\OperatorTok{==}\StringTok{ "Goal"}\NormalTok{),}
+            \DataTypeTok{n_shots =} \KeywordTok{n}\NormalTok{())}
+
+\NormalTok{tab_check <-}\StringTok{ }\NormalTok{tab_check }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{diff_sq =}\NormalTok{ (ave_exp_goals }\OperatorTok{-}\StringTok{ }\NormalTok{ave_act_goals)}\OperatorTok{^}\DecValTok{2}\OperatorTok{/}
+\StringTok{           }\NormalTok{((ave_exp_goals)}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{ave_exp_goals}\OperatorTok{/}\NormalTok{n_shots)))}
+
+\NormalTok{tab_check}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 5
+##    shot_prob_cat     ave_exp_goals ave_act_goals n_shots diff_sq
+##    <fct>                     <dbl>         <int>   <int>   <dbl>
+##  1 (0.000783,0.0946]         29.8             41    1025  4.29  
+##  2 (0.0946,0.187]            15.4             19     119  0.959 
+##  3 (0.187,0.28]              14.0             22      63  5.83  
+##  4 (0.28,0.373]               9.89             9      31  0.118 
+##  5 (0.373,0.466]              7.57             9      18  0.465 
+##  6 (0.466,0.559]              3.62             5       7  1.09  
+##  7 (0.559,0.652]              1.74             2       3  0.0914
+##  8 (0.652,0.744]              5.56             6       8  0.115 
+##  9 (0.744,0.837]             29.0             28      38  0.133 
+## 10 (0.837,0.931]              1.81             2       2  0.209
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hm_test <-}\StringTok{ }\NormalTok{tab_check }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{test_stat =} \KeywordTok{sum}\NormalTok{(diff_sq))}
+
+\NormalTok{hm_test}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##   test_stat
+##       <dbl>
+## 1      13.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1}\OperatorTok{-}\KeywordTok{pchisq}\NormalTok{(hm_test}\OperatorTok{$}\NormalTok{test_stat, }\DataTypeTok{df =} \DecValTok{8}\NormalTok{, }\DataTypeTok{lower.tail =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.1017906
+\end{verbatim}
+
+\emph{Looking at the value found from the Hosmer Lemeshow test, it would
+seem that we would accept the null hypothesis, suggesting that there is
+no lack of fit in the model.}
+
+\hypertarget{part-4-10-points}{%
+\section{Part 4 (10 points)}\label{part-4-10-points}}
+
+Use the home ice Bradley Terry model to answer the following questions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(broom)}
+\KeywordTok{library}\NormalTok{(BradleyTerry2)}
+\KeywordTok{head}\NormalTok{(icehockey)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       date         visitor v_goals        opponent o_goals conference
+## 1 20091008      Quinnipiac       4      Ohio State       2         NC
+## 2 20091008      Rensselaer       2   Massachusetts       5         NC
+## 3 20091009       Air Force       1   Bemidji State       3         NC
+## 4 20091009 Alab-Huntsville       3      Notre Dame       2         NC
+## 5 20091009            Army       4  Nebraska-Omaha       6         NC
+## 6 20091009   Bowling Green       2 Minnesota State       3         NC
+##   result home.ice
+## 1      1     TRUE
+## 2      0     TRUE
+## 3      0     TRUE
+## 4      1     TRUE
+## 5      0     TRUE
+## 6      0     TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(icehockey)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1083    8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{homeBT <-}\StringTok{ }\KeywordTok{BTm}\NormalTok{(result,}
+               \KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{team =}\NormalTok{ visitor, }\DataTypeTok{home.ice =} \DecValTok{0}\NormalTok{),}
+               \KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{team =}\NormalTok{ opponent, }\DataTypeTok{home.ice =}\NormalTok{ home.ice),}
+               \OperatorTok{~}\StringTok{ }\NormalTok{team }\OperatorTok{+}\StringTok{ }\NormalTok{home.ice,}
+               \DataTypeTok{id =} \StringTok{"team"}\NormalTok{, }\DataTypeTok{data =}\NormalTok{ icehockey)}
+
+\KeywordTok{tidy}\NormalTok{(homeBT)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 58 x 5
+##    term                  estimate std.error statistic  p.value
+##    <chr>                    <dbl>     <dbl>     <dbl>    <dbl>
+##  1 teamAir Force           -1.17      0.665    -1.75  0.0796  
+##  2 teamAlab-Huntsville     -0.449     0.609    -0.738 0.461   
+##  3 teamAmerican Int'l      -2.66      0.721    -3.68  0.000230
+##  4 teamAlaska               0.747     0.563     1.33  0.185   
+##  5 teamArmy                -1.60      0.671    -2.38  0.0173  
+##  6 teamBoston College       1.33      0.622     2.14  0.0325  
+##  7 teamBowling Green       -0.839     0.617    -1.36  0.174   
+##  8 teamBrown               -0.578     0.613    -0.943 0.346   
+##  9 teamBemidji State        0.885     0.589     1.50  0.133   
+## 10 teamBoston University    0.540     0.605     0.893 0.372   
+## # ... with 48 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{tidy}\NormalTok{(homeBT) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tail}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 5
+##   term                 estimate std.error statistic      p.value
+##   <chr>                   <dbl>     <dbl>     <dbl>        <dbl>
+## 1 teamUnion               0.260    0.593      0.438 0.661       
+## 2 teamVermont             0.786    0.604      1.30  0.193       
+## 3 teamWisconsin           1.51     0.514      2.94  0.00328     
+## 4 teamWestern Michigan   -0.304    0.597     -0.509 0.610       
+## 5 teamYale                0.519    0.629      0.825 0.409       
+## 6 home.ice                0.403    0.0709     5.69  0.0000000131
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(}\KeywordTok{BTabilities}\NormalTok{(homeBT), }\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                     ability      s.e.
+## Alaska Anchorage  0.0000000 0.0000000
+## Air Force        -1.1654793 0.6647895
+## Alab-Huntsville  -0.4490054 0.6085037
+## American Int'l   -2.6554773 0.7208618
+## Alaska            0.7468260 0.5630714
+## Army             -1.5974521 0.6713962
+## Boston College    1.3303922 0.6222599
+## Bowling Green    -0.8385947 0.6168775
+## Brown            -0.5780410 0.6128835
+## Bemidji State     0.8853896 0.5886569
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Assuming team strength is held constant, what are the increased odds
+  that the home team wins?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{exp}\NormalTok{(}\FloatTok{0.4028986}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.496155
+\end{verbatim}
+
+\emph{The odds of a team winning at home is 1.496 times higher than a
+neutral site, given a model with team strength.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Estimate the probability that Alabama Huntsville beating Air Force in
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  a game with no home-ice advantage
+\item
+  a game with Alabama Huntsville having home advantage
+\item
+  a game with Air Force having home advantage
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054}\NormalTok{)}\OperatorTok{/}\NormalTok{(}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054}\NormalTok{)}\OperatorTok{+}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{1.1654793}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6718301
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054+0.4028986}\NormalTok{)}\OperatorTok{/}\NormalTok{(}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054+0.4028986}\NormalTok{)}\OperatorTok{+}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{1.1654793}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.7538723
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054}\NormalTok{)}\OperatorTok{/}\NormalTok{(}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{0.4490054}\NormalTok{)}\OperatorTok{+}\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\FloatTok{1.1654793} \FloatTok{+0.4028986}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5777577
+\end{verbatim}
+
+\emph{The probability of Alabama Huntsville beating Air Force on neutral
+ice would be 67.2\%. The probability of Alabama Huntsville beating Air
+Force with Alabama Huntsville having home advantage would be 75.4\%. The
+probability of Alabama Huntsville beating Air Force with Air Force
+having home advantage would be 57.8\%.}
+
+
+\end{document}

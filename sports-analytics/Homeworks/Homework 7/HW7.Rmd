@@ -1,0 +1,149 @@
+---
+title: 'HW 7: NHL stats'
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates. 
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+# Homework questions
+
+## Part I: Readings
+
+1. Read the summary model by the Evolving Wild twins: 
+
+[https://rpubs.com/evolvingwild/395136/](https://rpubs.com/evolvingwild/395136/)
+
+Describe five unique hockey features that were implemented in their model. That is, look through their code, and highlight various ways that hockey-specific knowledge changed how they approached the problem.
+
+*Looking through all of the code, there are a few hockey specific modifications that I saw i their code. First, in the preparation stage, there was plenty of changes that were made to clean up the data. The first big change was to update the the distance of shot calculation to account for longer shots and their corresponding coordinates, angles, and zones. The next step was to then update the penalty shot strength states, however it is important to note that in the final model, penalty shots and shootouts are not included in the final model, as they are shots that should be on their own models. Another interesting step is how they created some new variables to discover any important trends. For example, there is a section in the code where thhey create variables for prior events, including distance from last shot, whether or not the current team shot last, and a metric called score state that finds the difference in the current score. In conclusion, the five hockey specific unique features that were implemented in the model would include the event zone, the event angle, the prior shot detail, the score up, and the event detail.* 
+
+2. Compare the three variable importance plots. Which variables were more important during even-strength play? Which were more important (relatively speaking) when a team was shorthanded or at uneven strength?
+
+*During even-strength play, the three most important variables would include shot distance, the seconds since the last shot, and the shot angle. The three most important variables for uneven strength are shot distance, the seconds since the last shot, and the distance from the last shot.*
+
+
+## Part II: Implementation
+
+We can access recent shot data here:
+
+```{r, eval FALSE}
+library(RCurl); library(tidyverse)
+gitURL<- "https://raw.githubusercontent.com/statsbylopez/StatsSports/master/Data/pbp_data_hockey.rds"
+pbp_data <- readRDS(gzcon(url(gitURL)))
+names(pbp_data)
+dim(pbp_data)
+```
+
+
+## Question 1
+
+Create a new variable for whether or not the shot occured during 5 v 5 play (that is, `home_skaters==5` and `away_skaters` == 5). Call this variable `is_5v5`. 
+
+```{r}
+pbp_data <- pbp_data %>% 
+  mutate(is_5v5 = if_else((pbp_data$home_skaters==5 & pbp_data$away_skaters==5), TRUE, FALSE))
+
+pbp_data
+```
+
+
+Next, identify the goal rate (e.g, how often each shot was turned into a goal) within each cohort of `is_5v5`. That is, were shots more or less likely to go in during 5v5 play?
+
+```{r}
+pbp_data %>%
+  group_by(is_5v5) %>%
+  summarise(n_goal_rate = (sum(event_type == "GOAL")/n()),
+            n_goals = sum(event_type == "GOAL"),
+            n_shots = n()) 
+```
+
+*Shots are less likely to go in during 5v5 play.*
+
+## Question 2
+
+Run the model below
+
+```{r}
+library(broom)
+fit_1 <- glm(event_type == "GOAL" ~ event_distance + 
+               event_angle + event_detail ,
+             family = "binomial", data = pbp_data)
+tidy(fit_1)
+```
+
+Interpret the coefficient on `event_detailWrist`
+
+*For any wrist shot taken, the odds of the shot going in increase by a factor of 1.264 in relation to a backhand shot, given angle and detail are in the model.*
+
+## Question 3
+
+Add `is_5v5` to your model in Question 2. Using AIC criterion, identify if this creates a preferable model.
+
+```{r}
+library(broom)
+fit_2 <- glm(event_type == "GOAL" ~ event_distance + 
+               event_angle + event_detail + is_5v5,
+             family = "binomial", data = pbp_data)
+tidy(fit_2)
+```
+
+```{r}
+AIC(fit_1)
+AIC(fit_2)
+```
+
+*It seems that the model that includes is_5v5 is the prefered model, as it produces a lower AIC value.*
+
+## Question 4
+
+For `game_id == 2017020324`, identify each participating team's goals and expected goals. Did the outcome of this game match the relative shot inputs?
+
+```{r}
+game <- pbp_data %>% filter(game_id == 2017020324)
+
+game
+
+game %>%
+  filter(event_team == "PIT") %>%
+  summarise(pit_xg = sum(shot_prob),
+            pit_g = sum(event_type == "GOAL"))
+
+game %>%
+  filter(event_team == "VAN") %>%
+  summarise(van_xg = sum(shot_prob),
+            van_g = sum(event_type == "GOAL"))
+```
+
+*The outcome of this game did not match the relative shot inputs. The Penguins were expected to score 4.48 goals, but only ended with 2 goals, while the Canucks were expected to only score 3.77 goals, but ended with 5 goals.*
+
+## Bonus
+
+Find the one game across the last two seasons where the different between the observed goal differential was as different from the expected goal differential
+
+```{r}
+pbp_data %>%
+  group_by(event_team) %>%
+  group_by(game_id) %>%
+  summarise(team_xg = sum(shot_prob),
+            team_g = sum(event_type == "GOAL"),
+            different = team_g-team_xg) %>%
+  arrange(different)
+```
+
+*The game with the greatest differential across observed goals and expected goals is game_id '2018020919'.*

@@ -1,0 +1,206 @@
+---
+title: 'HW 2: Linear regression and prediction using MLB players'
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, eval = TRUE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates. 
+
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+# Homework questions
+
+## Part I: Linear regression and player metrics
+
+Return to the `Lahman` package in R, and we'll use the `Batting` data frame. Type `?Batting` for specific insight into each variable. Primarily, it's a table with 22 batting metrics. *For all questions, we'll be using the `Batting_1` data frame. 
+
+```{r}
+library(tidyverse)
+library(Lahman)
+Batting_1 <- Batting %>% 
+  filter(yearID >= 2000) %>% 
+  select (playerID, yearID, AB:SO) %>% 
+  filter(AB >= 500)
+Batting_1
+```
+
+
+1. Describe the contents of `Batting_1`: that is, provide its dimensions, and what each row in the data set corresponds to. 
+
+*Batting_1 is a dataset that contains the hitting metrics for all batters after the year 1999 with at least 500 at bats for that season. Each row corresponds to one player in one season, and includes relevant batting metrics such as runs, hits, walks, and strikeouts. In this dataset there are 2003 entries, and each row has 13 corresponding variables.*
+
+2. When dealing with the `Teams` data set -- as in our labs and prior homework -- we often filtered by year. In the `Batting` data set, we are filtering by year and requiring an at-bat minimum. Why is this second step often required when working with players but not when working with teams?
+
+*The second step is required on a player level because without filtering on a minimum number of at bats, this could result in plenty of extra rows that have the potential to skew the data. For example, in baseball minor league players are often brought up to play in the majors, and it is common that those players are not successful and they are sent back down to the minor leagues again. If this happens multiple times in a season for multiple teams, this could create a few hundred entries of players with very low and unhelpful values for data analysis.*
+
+3. Make a correlation matrix - both a matrix of the variables, as well as a visualization -- using hits, doubles, triples, home runs, RBI, and strikeouts. 
+
+```{r}
+Batting_1_numeric <- select(Batting_1, H, X2B, X3B, HR, RBI, SO)
+correlation = cor(Batting_1_numeric)
+library(corrplot)
+round(correlation, 3)
+corrplot(correlation, method = "circle")
+```
+
+
+4. Make a scatter plot of runs batted in (RBI, the x-variable) and home runs (HR, the y-variable). Estimate and write the regression line using the `lm` command. Finally, interpret the slope and intercept of this line.
+
+```{r}
+ggplot(data = Batting_1, aes(x = HR, y = RBI)) + geom_point() + geom_smooth(method = "lm")
+fit_1 <- lm(RBI ~ HR, data = Batting_1)
+summary(fit_1)
+```
+
+*The slope states that for every home run a player hits, they are expected to have an increase in the number of runs batted in by about 1.82. This is more so a statement on the number of runners on base when a player does hit a home run, which states that often there are solo home runs, with exceptions of a runner, two runners, and sometimes three runners on base. The intercept states that if a player hits no home runs for a season, they are expected to end the year with around 42 total RBIs for the season.*
+
+5. Pete Alonso -- currently with the New York Mets -- has hit 47 home runs and batted in 109 runs (as of Sept 15, 2019). Given his home runs, what is his residual? That is, how many more or fewer runs batted in has he hit than we'd expect given his home runs?
+
+*With 47 home runs, the expected runs batted in for the season would be about 128.20. This leaves the resdiual for Pete Alonso to be -19.20, which means that he scored about 19 runs less than expected with the amount of home runs he hit for the seasons.*
+
+6. Alonso seems to have fewer runs batted in than we'd expect given his home runs. Provide a few explanations for this is the case. 
+
+*There could be mulitple reasons for why he has less RBIs than expected. One might be that maybe his team was not very successful, so they were seldom any baserunners when he hit his home runs. This would result in Alonso only hitting solo home runs, which could result in the slope being slightly overestimated in his case. Another explanation is that it is possible the Alonso was strictly a power hitter, and only hit home runs. This would mean that he was lesss efficient in converting runs when he hit anything other than home runs, which would suggest in this case that 40 RBIs aside from home runs would be a bit high.*
+
+7. Return to your scatter plot of RBI versus HR. Use the `annotate` command to add in a label (Alonso's name, or a symbol) with where Alonso lies. Read more about `annotate` here: [https://ggplot2.tidyverse.org/reference/annotate.html](https://ggplot2.tidyverse.org/reference/annotate.html). Among players hitting Alonso's number of home runs, is his RBI total surprising?
+
+```{r}
+rbi_hr <- ggplot(data = Batting_1, aes(x = HR, y = RBI)) + geom_point() + geom_smooth(method = "lm")
+rbi_hr + annotate("point", x = 47, y = 109, colour = "red")
+```
+
+*When plotting Alonso's results on the scatter plot, his totals are not too surprising. The number of RBIs is a bit low for the amount of home runs he hit, however his results are not an outlier, and they are not too far away for where the trendline is shown.*
+
+8. Run the following code:
+
+```{r}
+Batting_1 <- Batting_1 %>% 
+  mutate(K_rate = SO/(AB + BB))
+
+ggplot(data = Batting_1, aes(x = K_rate)) + 
+  geom_density()
+
+ggplot(data = Batting_1, aes(x = K_rate, colour = yearID, group = yearID)) + 
+  geom_density()
+
+```
+
+- what is `K_rate`?
+
+*K_rate is the number of times a better strikes out over all of his appearances at the plate.*
+
+- Describe the distribution of `K_rate`: e.g, what is its center, shape, and spread
+
+*Looking at the distribution for K_rate, it appears that the density curve has a center at about 0.15, and there appears to be a left skew. The spread seems to span from about 0.35 to 0.05, so there is a range of about 0.30.*
+
+- Describe how `K_rate` has changed over the last two decades. Be precise. Have the center/shape/spread changed? If so, by how much?
+
+*In a broad statement, it would appear that either pitchers are getting better, hitters are getting worse, or maybe both. One important thing to note is that the spread remains around 0.30 for much of the graph. However, as the years progress, it seems that the K_rate shape is moving away from a left skew, and appears to be moving towards a much more symmetrical curve. In addition, the center for graph shifted from about a 0.15 towards 0.20, which suggests that more batters are striking out more often then in years past.*
+
+### Part II: Predictability of player metrics
+
+In the above example, we looked at strikeout rate -- that is, the percentage of time that a player strikes out. 
+
+9. Read the article on baseball preditability here
+
+[https://blogs.fangraphs.com/basic-hitting-metric-correlation-1955-2012-2002-2012/](https://blogs.fangraphs.com/basic-hitting-metric-correlation-1955-2012-2002-2012/). 
+
+What rate metrics in baseball are most repeatable? Which metrics are least repeatable?
+
+*Based on the tables that are shown in the charts in the article, from the years 1955-2012, it seems that the most repeatable hitting metrics are (SO)/(AB+SF), SO/PA, HR/(B-K+SF), while the least repeatable metrics are (BABIP), (3B+2B)/(H-HR), 2B/PA. From the years 2002-2012, it seems that the most repeatable hitting metrics are Contact%, SwStr%, and (SO)/(AB+SF), while the least repeatable metrics are (BABIP), 2B/PA, LD%*
+
+Let's assess the repeatability of the metrics in `Batting_2`, shown below:
+
+```{r}
+Batting_2 <- Batting_1 %>% 
+  mutate(HR_rate = HR/(AB + BB), 
+         BB_rate = BB/(AB + BB), 
+         RBI_rate = RBI/(AB + BB))
+
+Batting_2 <- Batting_2 %>% 
+  arrange(playerID, yearID) %>% 
+  group_by(playerID) %>% 
+  mutate(HR_rate_next = lead(HR_rate), 
+         K_rate_next = lead(K_rate), 
+         BB_rate_next = lead(BB_rate), 
+         RBI_rate_next = lead(RBI_rate)) %>% 
+  ungroup() %>% 
+  filter(!is.na(HR_rate_next)) 
+Batting_2
+```
+
+*Note:* The code drops the last year of a players' career -- there is no future variable to look at. 
+
+10. Use (i) scatter plots and (ii) correlation coefficients to assess the year-over-year repeatability of strikeout rate, walk rate (`BB_rate`), HR rate, and RBI rate. That is, compare each metric in a players' current year to the metric that he records in the following year. Which of these metrics is most repeatable? Which of these is least repeatable?
+
+```{r}
+ggplot(data = Batting_2, aes(x = HR_rate, y = HR_rate_next)) + geom_point() + geom_smooth(method = "lm")
+ggplot(data = Batting_2, aes(x = K_rate, y = K_rate_next)) + geom_point() + geom_smooth(method = "lm")
+ggplot(data = Batting_2, aes(x = BB_rate, y = BB_rate_next)) + geom_point() + geom_smooth(method = "lm")
+ggplot(data = Batting_2, aes(x = RBI_rate, y = RBI_rate_next)) + geom_point() + geom_smooth(method = "lm")
+
+Batting_2_numeric <- Batting_2 %>% 
+  select(HR_rate_next, K_rate_next, BB_rate_next, RBI_rate_next, HR_rate, K_rate, BB_rate, RBI_rate)
+
+cor_matrix <- cor(Batting_2_numeric, use="pairwise.complete.obs")
+cor_matrix
+```
+
+
+*From the data shown above, it seems like K_rate and BB_rate had the strongest association with their next years predicted value, while HR_rate and RBI_rate seemed to have a weaker association. This seems to show that K_rate and BB_rate are more repeatable than HR_rate and RBI_rate.* 
+
+11. We introduced two additional ways of assessing prediction error, mean absolute error and mean squared error. Here's an example of how to code these in R.
+
+```{r}
+Batting_2 %>% 
+  summarise(mae_k_rate = mean(abs(K_rate - K_rate_next)), 
+            mse_k_rate = mean((K_rate - K_rate_next)^2))
+```
+
+Interpret the `mae_k_rate` above. How does this number relate to the scatter plot (using `K_rate`) in Question No. 10?
+
+*Mean absolute error measures the error found in the predicted value, so this would mean in this case that there is an average error of about 0.0217 found in the K_rates between the predicted and actual value. This value is relatively low, which would agree with our findings, as it seems that K_rate was the most repeatable out of the four variables that were reviewed.*
+
+12. Repeat the calculations in No. 11, only using `HR_rate` instead of `K_rate`.
+
+```{r}
+Batting_2 %>% 
+  summarise(mae_k_rate = mean(abs(HR_rate - HR_rate_next)), 
+            mse_k_rate = mean((HR_rate - HR_rate_next)^2))
+```
+
+13. What does the following code show?
+
+```{r}
+ggplot(data = Batting_2, aes(x = yearID, y = HR_rate)) +   
+  geom_line(aes(group = playerID), colour = "grey") + 
+  geom_point(aes(group = playerID), colour = "grey") + 
+  geom_smooth()
+```
+
+*The code above is showing the differences in HR-rate across multiple seasons from individual players.*
+
+14. Repeat the code in No. 13, only for K rate. Have hitters been hitting less home runs with the increase in strikeouts?
+
+```{r}
+ggplot(data = Batting_2, aes(x = yearID, y = K_rate)) +   
+  geom_line(aes(group = playerID), colour = "grey") + 
+  geom_point(aes(group = playerID), colour = "grey") + 
+  geom_smooth()
+```
+
+*From the scatter plot shown above, it appears that on average, hitters seem to be striking out more often in recent year then they were in the early 2000s. With that said, from the scatter plot regarding home run rate, it seems although the trendline has some vertical movement, the average seems to settle at about the same spot between the early 2000s and recent years. However, one interesting note is that in years between 2013 and 2015, home run rate took its worst dip, where it seems that strikeout rate continued to rise slightly quicker than in the years prior.*

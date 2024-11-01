@@ -1,0 +1,275 @@
+---
+title: 'HW 6: NFL expected pts'
+author: "Shane Fuller"
+date: "Fall 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, digits = 3, warning = FALSE)
+```
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates. 
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+# Homework questions
+
+## Part I: Football readings
+
+Readings are up on football. 
+
+1. Read `Kickers are Forever`. 
+
+- How does the model in Footnote 5 compare to the models we fit in class? What does the author say about the primary driver of field goal success?
+
+*The model in footnote 5 seems to have additional metrics and information that we have not focused heavily on in class. For example, the model shown in footnote 5 includes a categorical metric that describes information regarding the field, the hash marking, as well as a metric called seas. In addition, the model that was caluclated is a binomial model with a link to probability, as well as a few addeded weights that are included in the model. As the author describes, this model was very successful, and was effective in describing the success of the kick.*
+
+- More generally, what does the author say about how field goal success redefines the fourth down bot model?
+
+*As shown in the chart "Better Kicking Changes the Math On Fourth Down", with the new data on field goal success, this caused the bot to suggest that teams should choose to go for the field goal more often on 4th down. The biggest change came from when the distance is around 55 yards. Before the data, the bot suggested to only not go for it when the team was 4th and 9 or 4th and 10. After the new data was added regarding kicker success, the bot now suggests to go for the kick when the ball is greater than 4th and 4 away from a first down.*
+
+2. Read `It sucks to kick in the cold`. 
+
+- One variable not included in our model of field goal kickers was wind chill. Describe the impact of wind chill on field goal success -- be precise, and use numbers from the graph.
+
+*Windchill has a negative effect on the success of field goal attempts. As the article describes it, a 40 yard field goal with a below 25 windchill is roughly the same probablility as a 50 yard field goal in warmer weather. Essentially here, the weather is efecting the kick by about 10 yards.*
+
+- Assume Kicker A kicks in Chicago, where the wind chill is often cold, while Kicker B kicks in Detroit, which plays indoors, where there is never any wind. In the model we fit in class, assume Kicker A and Kicker B appeared identical. Describe which kicker you think is actually better, now knowing that your model did not include wind chill. 
+
+*With this data, I would assume that kicker A is a more skilled kicker than kicker B. I would say this beacuse if kicker A is often playing in Chicago, this would mean that kicker A is forced to kick more dificult kicks than kicker B. However, if their results are nearly identical, this either means that kicker A was over performing in his conditions, or kicker B was under performing in his conditions. Either way, it would appear that kicker A is the better kicker.*
+
+3. Read `Decision theory in football`
+
+- Using multiple examples from other sports, highlight how minimax, prospect theory, and risk aversion impact decisions in sports. 
+
+*One example of minimax in another sport is in basketball, specifically if a player is on a fastbreak with no defenders around. The player could shoot a 3, which would net the team more points, however the expected value would be lower than if they player just went in for a layup, which has a very high expected value. In most situations, the player would take the layup, even though it has a lower potential. Prospect theory states that coaches recieve more pain from losing than they recieve joy from winning. This essentially causes more conservative decisions in every sport. For example, in baseball a coach is likely to send someone to steal, as they would feel much worse losing a baserunner than they would feel joy from gaining a baserunner in scoring position. Lastly, risk aversion impact states a similar theory regarding making the conservative choice, as it is diffcult to prioritize reward over risk in decision making processes. One example of this in hockey was in the decision to not pull goalies, even though it appeared in the data that it is a benefical strategy in late games.*
+
+## Part II: Basketball
+
+Here, we'll be implementing logistic regression to estimate the probability of successful NBA shots. We'll also link to themes from our football unit - such as expected points added - and increase our visual literacy by sampling some of the `ggplot()` package in R. As one additional tool, I'll walk through a few examples of how we can **clean** what is originally a messy data set.
+
+
+Next, we'll load this as the `url` using the `getURL` command, and load it into R. 
+
+```{r}
+library(RCurl)
+library(tidyverse)
+url <- getURL("https://raw.githubusercontent.com/JunWorks/NBAstat/master/shot.csv")
+nba_shot <- read.csv(text = url)
+```
+
+
+\section{Data Cleaning}
+
+The `nba_shot` data contain roughly 200,000 shots from the 2014-2015 season. This is awesome. However, much like real life, things are never as easy as they seem. Let's start by summarizing our data:
+
+```{r}
+head(nba_shot)
+summary(nba_shot)
+```
+
+
+1. What does each row refer to, and what are each of the columns?
+
+*Each row is a distinct shot that was taken in the 2014-2015 season, and each column is a variable that describes the different conditions of that shot, including who shot it, the teams that were playing, the final margin, how many dribbles were taken before the shot, how long they were holding the ball before the show, who the closest defender was, in addition to others.*
+
+2. Identify some issues that you see in the data set by looking at the output of the `summary()` command. For example, look for missing values or measurements that, from a basketball perspective, don't make sense.
+
+```{r}
+summary(nba_shot)
+```
+
+*The first obvious issue that I found is in the touch time variable, where the min is -192.00. From a basketball perspective, this doesn't make sense, as this would mean that the player had the ball for -192 seconds before he shot it. Another problem in the data set is in the lack of reliable data on shot clock, as there are over 8500 NA's for this category. The last error that I found in data set is in the points category, where the max is 6, suggesting that 6 points were scored in the possession, which isn't possible.*
+
+Interestingly, a handful of shots are missing shot-clock information. There could be several explanations for this - an error in the data collection process, a broken shot clock, etc - and if we had more time, it may be worth exploring why this information is missing. 
+
+In the meantime, there are several ways of dealing with missing data - a whole [book](http://www.amazon.com/Statistical-Analysis-Missing-Roderick-Little/dp/0471183865), in fact - but for today's purposes, we will make some assumptions and drop any rows with missing data. This will make our eventual analysis much easier.
+
+```{r}
+nba_shot <- na.omit(nba_shot)
+```
+
+Note that dropping missing rows in this data set is more reasonable, given that the number of rows that we dropped accounts for less than 5\% of the overall data.
+
+There are some other issues that we should double check. The variable `PTS` contains the number of points that each shot was worth, and the variables `PTS_TYPE` and `SHOT_DIST` indicate the type of shot and distance.
+
+```{r}
+nba_shot %>% count(PTS_TYPE)
+ggplot(nba_shot, aes(SHOT_DIST)) + 
+  geom_histogram() + 
+  facet_wrap(~PTS_TYPE)
+nba_shot %>% filter(PTS_TYPE == 3) %>% summarize(min_dist = min(SHOT_DIST))
+nba_shot %>% filter(PTS_TYPE == 3, SHOT_DIST < 21) %>% dim()
+```
+
+
+In the second table, there are roughly 1400 shots which are listed as three pointers, even though they were they were taken from a distnace of less than 21 feet. Given that the three-point line is at least 22 feet from the basket, it does not make sense to use these observations. 
+
+Here's one way of getting rid of the funny rows. 
+
+```{r}
+nrow(nba_shot)
+nba_shot <- nba_shot %>% 
+  filter(SHOT_DIST>=21 |PTS_TYPE==2)
+nrow(nba_shot)
+```
+
+
+3. How many rows were dropped using the above filtering?
+
+*It seems that 276 shots were dropped from the data set.*
+
+
+\section{Expected points}
+
+All else being equal, what's the most efficient shot in the NBA?
+
+Let's start by comparing the success rates of two-point shots to three-point shots. 
+
+```{r}
+nba_shot %>% 
+  group_by(PTS_TYPE) %>% 
+  summarise(success_rate = mean(SHOT_RESULT == "made"))
+```
+
+
+4. Identify the expected point totals from all two-point shots and three-point shots in the 2014-15 season.  Which one was preferred?
+
+*The expected point total for 2 point shots was 0.96, while the expected point total for 3 point shot was 1.08. Therefore, is seems that the three point shot would be preferred.*
+
+
+Let's look at certain players. 
+
+```{r}
+
+nba_shot %>% 
+  filter(playerName == "Stephen Curry") %>% 
+  group_by(PTS_TYPE) %>% 
+  summarise(success_rate = mean(SHOT_RESULT == "made"))
+
+
+nba_shot %>% 
+  filter(playerName == "Kevin Garnett") %>% 
+  group_by(PTS_TYPE) %>% 
+  summarise(success_rate = mean(SHOT_RESULT == "made"))
+```
+
+5. For Curry and Garnett, calculate their expected point totals on two and three-point shots. What does that suggest about their optimal choices?
+
+*For Curry his expected point total for a 2 point shot is 1.07, and his expected total for a 3 point shot is 1.36. Therefore, the optimal choice for Curry would be to look to take 3s. For Garnett, the expected point total for a 2 pooint shot is 0.95, and his expected total for a 3 point shot is 0.75. Therefore, the optimal choice for Garnett would be to look for a 2 point shot.*
+
+
+\section{Logistic Regression}
+
+Logistic regression will be another useful tool to (i)identify impacts of shooting success and (ii) allow us to judge which players have outperformed or underperformed expectations. 
+
+Here's one model.
+
+```{r}
+fit_1 <- glm(SHOT_RESULT == "made" ~ SHOT_DIST + TOUCH_TIME + 
+            DRIBBLES + SHOT_CLOCK + CLOSE_DEF_DIST, 
+             data = nba_shot, family = "binomial")
+```
+
+
+6. Estimate the increased odds of a made shot taken with 1 more second left on the shot clock. Then, estimate the increased odds of a made shot with 10 more seconds on the shot clock.
+
+```{r}
+library(broom)
+tidy(fit_1)
+```
+
+```{r}
+exp(-0.016)
+exp(10*-0.016)
+```
+
+*Given shot distance, touch time, dribbles, and closest defender distance, the odds of a made shot taken with one more second left of the clock is about 1.02 times that of the original shot. in addition, given shot distance, touch time, dribbles, and closest defender distance, the odds of a made shot taken with ten more second left of the clock is about 1.15 times that of the original shot.*
+
+
+We use the following to get each shot's expected points (given `fit_1()`), as well as the expected points added (`epa`) given the shot result.
+
+```{r}
+nba_shot <- nba_shot %>%
+  mutate(predicted.probs = fitted(fit_1), 
+         expected.pts = predicted.probs * PTS_TYPE, 
+         epa = PTS - expected.pts)
+```
+
+7. Look at the first row of the data set. Where do the `predicted.probs` (0.489), `expected.pts` (0.978), and `epa` (1.02) come from?
+
+```{r}
+head(nba_shot)
+```
+
+*Predicted probability comes from the model that was calculated earlier, and states the expected probablility of the shot going in based on the parameters in the row. The expected points is just the probability of the shot going in times the value of the point type. EPA is the points that were produced from the attempt subrtacted by the expected point value.*
+
+It's also possible to look at individual shots based on their expected points. For example, here are the six of the most difficult shots
+
+```{r}
+head(arrange(nba_shot, expected.pts))
+```
+
+Interestingly, what do we notice about the data set's most difficult shot? It went in!
+
+Here's a video ([link](https://www.youtube.com/watch?v=SH_5YcpdCgw)).
+
+Alternatively, here are the six shots worth the highest expected point totals.
+
+```{r}
+head(arrange(nba_shot, -expected.pts))
+```
+
+In each of these examples, the shot is a three-pointer with more than an 80\% chance of going in. 
+
+8. Looking at six *easy* shots above - can you tell where and why our logistic regression model went wrong?
+
+*The problem with the model is that it seems to think that 3 point shots are the easiest shots to take. One consistent pattern is that for each shot listed, they were all off ball shots, meaning that they did not dribble before they took their shots. Another interesting note is that this model took the touch time with the -192 value that was mentioned before as the easiest shot.*
+
+We use a similar procedure to the one we developed with field goal kickers to estimate the cumulative expected points added from NBA shooters.
+
+```{r}
+shot_group <- nba_shot %>% 
+  group_by(playerName) %>%
+  summarise(total.epa = sum(epa), n.shots = length(epa)) %>%
+  arrange(total.epa)
+head(shot_group)
+tail(shot_group)
+```
+
+For those of us who are basketball fans, these names match our expectations. Stephen Curry was worth nearly 300 points alone, relative to expectation, on his outstanding shooting. 
+
+\subsection{Visualizing expected points}
+
+Let's graph the metrics we just calculated. In this example, we'll make our first `ggplot()` graph of the semester (*Note*: `ggplot()` is its own package, but it also comes along when we load `mosaic`. 
+
+```{r}
+ggplot(shot_group, aes(n.shots, total.epa, label = playerName)) + 
+   geom_text() + 
+  scale_y_continuous("Expected Points Added") + 
+  scale_x_continuous("Shot attempts") + 
+  ggtitle("Expected points added ~ number of shots, 2014-15 season") +
+  theme_bw()
+```
+
+
+9. Describe the distribution of expected points added as a function of shot attempts. Why does the distribution fan out? Why does the distribution fan out on only one side? 
+
+*So for the majority of players, they usually stick around the 0 expected points added, as this describes most players who are of average skill. However, as shots increase, there seems to be an almost exponential increase in the expected points added, and this is because teams give these players more opportunities to score simply because they are good enough to convert points when it seems unlikely that they should be able to. Essentially, teams are happy to give these players more shots because they have a higher likelihood of converting difficult shots.*
+
+10. Our model of shot probabilities is probably missing some other variables that effect success rates. What ones can you think of?
+
+*A few additional variables that I would be interested in seeing in terms of whether or not a shot went in would involve at what time in the game the shot was taken, whether or not these shots were taken during the playoffs, and some metric to see how good the defenders are who were guarding the pkayers. The last metric I would be interested in looking at is the players relative position, as I would like to also see the differences across shooting guards and centers in our model.*
+
+11. Returning to the issue from question (8). How does Krishna deal with this problem [here](http://nyloncalculus.com/2015/09/28/introducing-kobe-a-measure-of-shot-quality/)?
+
+*So their are a few things that Krishna does to deal with the problems with question 8. The first thing to note is that he creates a new metric for properly identifying shot difficult, which he calls the KOBE metric, which is the Krishna's Objective Basket Estimator. The first step in creating this metric is differentiating the differences between long and close shots, where there is some slight modifications to whether the long shots are off the dribble or not. Next, he did some work with binning the closest defender metric, this way this would not be overfit like what was seen in the previous example of number 8. Essentially, the KOBE statistic finds the true difficulty of a shot, whithout the overfitting that occurred from certain variables that was found in number 8.*

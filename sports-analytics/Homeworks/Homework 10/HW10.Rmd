@@ -1,0 +1,161 @@
+---
+title: 'HW 10: Paired comparison models'
+author: "Shane Fuller"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+  pdf_document: default
+---
+
+# Preliminary notes for doing HW
+
+1. All files should be knit and compiled using R Markdown. Knit early and often! I do not recommend waiting until the end of the HW to knit.
+
+2. All questions should be answered completely, and, wherever applicable, code should be included. 
+
+3. If you work with a partner or group, please write the names of your teammates.
+
+4. Copying and pasting of code is a violation of the Skidmore honor code
+
+## Overview
+
+In this HW, we are going to implement and analyze the results of Bradley-Terry models. 
+
+We are going to use a data set that comes with the `BradleyTerry2` package called **icehockey**.
+
+```{r}
+library(tidyverse)
+library(BradleyTerry2)
+head(icehockey)
+summary(icehockey)
+dim(icehockey)
+```
+
+The data contain 1083 games from the 2009-10 NCAA college hockey season. More of the variables are self-explanatory, but there are a few that are worth pointing out.
+
+First, game results are coded as `0`, `0.5`, or `1`. 
+
+## Exploratory analysis
+
+1. Make a histogram identifying the total number of goals in each game (you'll have to make this variable), faceted by conference. Then calculate the mean total goals per game for each conference. Compare the centers, shapes, and spread of this variable (total number of goals scored) between the conferences.
+
+```{r}
+icehockey <- icehockey %>% 
+  mutate(total_goals = v_goals + o_goals)
+
+ggplot(icehockey, aes(x=total_goals, fill=conference, color=conference)) + geom_histogram()
+
+ggplot(icehockey, aes(x=conference, y=total_goals)) + geom_boxplot()
+
+average_goals_data <- icehockey %>%
+  group_by(conference) %>%
+  summarise(average_goals = sum(total_goals) / n(), total_games = n()) %>%
+  arrange(-average_goals)
+
+average_goals_data
+```
+
+*Looking at the data, there are a few relevant points to take away. First, it is important to note the number of games player in each conference. The NC conference has the most games with 332, the CH conference has the least games with 36, and the remaining conferences have a similar number of games around 150. That being said, the spread for all conferences is similar, and each have a range of between around 0 goals and 17 total goals in a game. The CH conference has the smallest spread while the CC conference has the largest spread. Regarding shape, looking at the histogram is appears that all the conferences have a relatively normal distribution. It appears that the WC conference has a larger right skew than the others, but most appear to have relatively normal distribution. Regarding center, again all conferences are relatively similar. The EC conference has the largest average total goal per game with 6.29, while the CC conference has the lowest average goals per game with 5.42.*
+
+2. Look only at the games not played at neutral sites (`home.ice == FALSE`). How many more goals per game does the home team score, on average, than the away team?
+
+```{r}
+icehockey_away <- icehockey %>%
+  ungroup(conference) %>%
+  filter(home.ice == FALSE) %>%
+  summarise(average_goals = sum(total_goals) / n(), total_games = n()) %>%
+  arrange(-average_goals)
+
+icehockey_home <- icehockey %>%
+  ungroup(conference) %>%
+  filter(home.ice == TRUE) %>%
+  summarise(average_goals = sum(total_goals) / n(), total_games = n()) %>%
+  arrange(-average_goals)
+
+icehockey_away
+icehockey_home
+```
+
+*It appears that the average goals for teams playing away from home ice is 5.565217, while the average goals for teams playing on a home ice is 5.883629. This means that games that are played at a neutral site to to have 0.318412 less goals than games that are not played on neutral ice.*
+
+## Fitting the standard Bradley-Terry model
+
+First, let's start by fitting the standard BTM model on this data set. 
+
+```{r}
+standardBT <- BTm(outcome = result,
+    player1 = visitor, player2 = opponent,
+    id = "team", data = icehockey)
+library(broom)
+tidy(standardBT) 
+
+abilities <- exp(BTabilities(standardBT))
+abilities <- data.frame(abilities)
+abilities$Team <- rownames(BTabilities(standardBT))
+abilities %>%
+  arrange(ability) 
+```
+
+3. Using the output, estimate the probability of Boston College beating Army.
+
+*The probability of Boston College beating Army is about 95.5%.*
+
+4. Identify the biggest mismatch in teams, and what the probability is of the worse team winning that game.
+
+*The greatest mismatch between teams would be between Denver and American International, and the probability that the team would be 0.01.*
+
+## BTM with home ice included. 
+
+Let's return to our original equation, and add in a home advantage term.
+
+**Original**: log(Odds ($i$ beats $j$)) = $\lambda_i$ - $\lambda_j$ where $\lambda_i = log(\alpha_i)$ and $\lambda_j = log(\alpha_j)$
+
+**Home advantage**: log(Odds ($i$ beats $j$ in a home game for $i$)) = $\lambda_i$ - $\lambda_j$ where $\lambda_i = log(\alpha_i + \omega_i)$ and $\lambda_j = log(\alpha_j)$, where $\omega_i$ is an indicator for the game being played at team $i$. *Note*: If the game is played at a neutral site, $\omega_i = 0$. 
+
+Here's the home ice model
+
+```{r, eval = FALSE}
+homeBT <- BTm(result,
+               data.frame(team = visitor, home.ice = 0),
+               data.frame(team = opponent, home.ice = home.ice),
+               ~ team + home.ice,
+               id = "team", data = icehockey)
+
+tidy(homeBT)
+tidy(homeBT) %>% tail()
+head(BTabilities(homeBT), 10)
+```
+
+
+5. Assuming team strength is held constant, what are the increased odds that the home team wins?
+
+*The odds of a team winning at home is 0.402 times greater than a neutral site, given a model with team strength.*
+
+6. Estimate the probability that Boston College beating Army in 
+
+- a game with no home-ice advantage (this should be similar to your answer to question 3).
+- a game with Boston College having home advantage
+- a game with Army having home advantage
+
+```{r}
+exp(1.3303922)/(exp(1.3303922)+exp(-1.5974521))
+exp(1.3303922+0.4028986)/(exp(1.3303922+0.4028986)+exp(-1.5974521))
+exp(1.3303922)/(exp(1.3303922)+exp(-1.5974521+0.4028986))
+```
+
+
+*The probability of Boston College beating Army on neutral ice would be 94.9%. The probability of Boston College beating Army having home advantage would be 96.5%. The probability of Boston College beating Army with Army having home advantage would be 92.6%.*
+
+7. Use your answers to the previous question to confirm that the odds of a home win in hockey are about 1.496 times higher than a road team win, assuming team strength is fixed.
+
+```{r}
+0.9492058/(1-0.9492058)
+0.9654685/(1-0.9654685)
+0.9258722/(1-0.9258722)
+
+27.95907/18.68729
+18.68729/12.49022
+```
+
+*If we assume that team strength is fixed, lookng at the previous answers, if we take the probabilities for both and relate these to neutral ice probabilities, the answers come out to be about 1.496. Therefore, this would suggest that the odds of a home win in hockey are about 1.496 times higher than a road team win.*

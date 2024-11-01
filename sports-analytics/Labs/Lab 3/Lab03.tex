@@ -1,0 +1,369 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Multiple regression and R-squared},
+            pdfauthor={Michael Lopez, Skidmore College},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Multiple regression and R-squared}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Michael Lopez, Skidmore College}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+\hypertarget{overview}{%
+\subsection{Overview}\label{overview}}
+
+In this lab, we'll learn model comparison tools using multivariate
+regression. Next, we'll apply our tools to derive predictions of pitcher
+performance.
+
+First, recall that we have to load the requisite libraries that we'll
+need (and we may have to install them, too. As always, once a package is
+downloaded, you do not need to run the \texttt{install.packages()} code
+again.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(Lahman)}
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+We're going to start by using the \texttt{Teams} data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{(Teams)}
+\KeywordTok{head}\NormalTok{(Teams)}
+\KeywordTok{tail}\NormalTok{(Teams)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams}\FloatTok{.1}\NormalTok{ <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(Teams, yearID }\OperatorTok{>=}\StringTok{ }\DecValTok{1970}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(Teams}\FloatTok{.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{comparing-multiple-regression-models.}{%
+\subsection{Comparing multiple regression
+models.}\label{comparing-multiple-regression-models.}}
+
+There's an old saying in statistics, attributed to George Box:
+\(\textit{all models are wrong, some are useful}\). In practice, we
+never know if our regression model is correctly specified; e.g, that it
+is really the case the \(y\), \(x_1\), \ldots{} and \(x_{p-1}\) are
+linearly related. All we can do is hope\ldots{}and try a few analytical
+tools.
+
+Let's try to come up with a few models of \texttt{RA}: runs against.
+First, we start with a recap of multiple regression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(broom)}
+\NormalTok{fit}\FloatTok{.1}\NormalTok{ <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(RA }\OperatorTok{~}\StringTok{ }\NormalTok{HRA }\OperatorTok{+}\StringTok{ }\NormalTok{BBA }\OperatorTok{+}\StringTok{ }\NormalTok{SOA }\OperatorTok{+}\StringTok{ }\NormalTok{HA }\OperatorTok{+}\StringTok{ }\NormalTok{attendance, }\DataTypeTok{data =}\NormalTok{ Teams}\FloatTok{.1}\NormalTok{)}
+\KeywordTok{tidy}\NormalTok{(fit}\FloatTok{.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write the estimated model above.
+\end{enumerate}
+
+\emph{RA-hat = -1.54 + 1.26(HRA-hat) + 3.54(BBA-hat) - 6.53(SOA-hat) +
+3.99(HA-hat) - 3.53(attendance-hat)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Using the model in question (1), interpret the coefficient on
+  \texttt{HRA}.
+\end{enumerate}
+
+\emph{For every 1 home run allowed, there is an expected increase in
+runs allowed by 1.25, given we have BBA, SOA, HA, and attendance in the
+model.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Using the model in (1), interpret the coefficient on
+  \texttt{attendance}. Then come up with a better way to interpret the
+  coefficient on \texttt{attendance}.
+\end{enumerate}
+
+\emph{For every 1 home run allowed, there is an expected increase in
+runs allowed by 1.25, given we have BBA, SOA, HA, and attendance in the
+model.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Remove \texttt{HRA} from the model and re-fit. Do your other
+  coefficients change? Can you explain the difference?
+\end{enumerate}
+
+After fitting a linear regression model, it is appropriate to check
+assumptions. First, we check the appropriateness of the normal
+distribution for residuals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{qqnorm}\NormalTok{(fit}\FloatTok{.1}\OperatorTok{$}\NormalTok{resid)}
+\KeywordTok{qqline}\NormalTok{(fit}\FloatTok{.1}\OperatorTok{$}\NormalTok{residuals)}
+\end{Highlighting}
+\end{Shaded}
+
+Next, we compare the residuals to the fitted values, checking for the
+assumptions of independence among the residuals, as well as the constant
+variance assumption.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ fit}\FloatTok{.1}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ fit}\FloatTok{.1}\OperatorTok{$}\NormalTok{fitted.values, }\DataTypeTok{y =}\NormalTok{ fit}\FloatTok{.1}\OperatorTok{$}\NormalTok{residuals)) }\OperatorTok{+}\StringTok{ }
+\StringTok{         }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  What do the residual plots suggest about the assumptions of our linear
+  regression model? What about the model makes it possibly a poor fit?
+\end{enumerate}
+
+Speaking of residuals, lets take a deeper look at individual
+predictions.
+
+The 1970 Atlanta Braves allowed 185 home runs, 478 walks, struck out 960
+batters, and gave up 1451 hits. Their attendance was 1078848. As it
+turns out, the Braves are the first row of our data set.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Teams}\FloatTok{.1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+
+\NormalTok{Teams}\FloatTok{.1}\NormalTok{ <-}\StringTok{ }\NormalTok{Teams}\FloatTok{.1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{fitted.value =} \KeywordTok{predict}\NormalTok{(fit}\FloatTok{.1}\NormalTok{))}
+
+\NormalTok{Teams}\FloatTok{.1} \OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  The \texttt{predict} command calculates the fitted number of runs
+  using a model such as ours (our model is \texttt{fit.1}. Using the
+  code above, how many runs did our model predict that Braves to have
+  allowed? What is the residual for the number of runs allowed by the
+  Braves? Did our model overestimate or underestimate Atlanta's
+  performance?
+\end{enumerate}
+
+\hypertarget{r-squared}{%
+\subsubsection{R-squared}\label{r-squared}}
+
+There are lots of ways to measure the success of a regression model. The
+most common metric is \texttt{R-squared}, which you'll recall is the
+fraction of variability in the outcome which is explained by the
+regression model. Larger R-squared's are, in principal, better.
+
+You can access the R-squared via the \texttt{summary} command:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit}\FloatTok{.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Using our model, we would interpret the R-squared as follows:
+
+\textit{90.09\% of the variability in the number of runs allowed by a team can be explained by the linear model with HRA, BBA, SOA, HA, and attendance}.
+
+While popular, the traditional R-squared is also flawed. Let's see how.
+In the following code, we'll create two new variables in the
+\texttt{Teams.1} data set, \texttt{rand1} and \texttt{rand2}, which are
+random normal variables.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{Teams}\FloatTok{.1}\NormalTok{ <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(Teams}\FloatTok{.1}\NormalTok{, }
+                  \DataTypeTok{rand1 =} \KeywordTok{rnorm}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(Teams}\FloatTok{.1}\NormalTok{)),}
+                  \DataTypeTok{rand2 =} \KeywordTok{rnorm}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(Teams}\FloatTok{.1}\NormalTok{)))}
+\KeywordTok{head}\NormalTok{(Teams}\FloatTok{.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Let's see what happens when we include \texttt{rand1} and \texttt{rand2}
+to our regression fit.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit}\FloatTok{.2}\NormalTok{ <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(RA }\OperatorTok{~}\StringTok{ }\NormalTok{HRA }\OperatorTok{+}\StringTok{ }\NormalTok{BBA }\OperatorTok{+}\StringTok{ }\NormalTok{SOA }\OperatorTok{+}\StringTok{ }\NormalTok{HA }\OperatorTok{+}\StringTok{ }\NormalTok{attendance }\OperatorTok{+}\StringTok{ }\NormalTok{rand1 }\OperatorTok{+}\StringTok{ }\NormalTok{rand2, }\DataTypeTok{data =}\NormalTok{ Teams}\FloatTok{.1}\NormalTok{)}
+\KeywordTok{summary}\NormalTok{(fit}\FloatTok{.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Even when we added random noise to the model, R-squared went up!
+
+That's not a good thing, at least when it comes to making model
+comparisons. In fact, its a property of R-squared that, no matter what
+variable you add to a given model, the R-squared cannot go down. As a
+result, R-squared is not useful for model comparisons, but more to gain
+a sense of how much of a drop in the variability in the outcome can be
+explained by the model's fit.
+
+In place of R-squared, R also shows a formula for an adjusted R-squared,
+which penalizes models for adding unneeded parameters. However, this
+metric also has weaknesses.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\item
+  When \emph{would} be an appropriate time to compare R-squared's from
+  two different models?
+\item
+  What other approaches to picking a model may be more appropriate than
+  R-squared?
+\end{enumerate}
+
+
+\end{document}
